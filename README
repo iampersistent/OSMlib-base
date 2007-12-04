@@ -1,11 +1,23 @@
 
-OSM Library
+OSM Library - Base
 
-Library for handling OpenStreetMap data.
+A library for handling OpenStreetMap data.
+
+This work is released into the public domain. This applies worldwide.
+In case this is not legally possible, any entity is granted the right
+to use this work for any purpose, without any conditions, unless such
+conditions are required by law.
 
 Developer: Jochen Topf <jochen@topf.org>
-Web: http://rubyforge.org/projects/osmlib/
-     http://osmlib.rubyforge.org/
 
-Alpha version.
+For more information see:
+* http://rubyforge.org/projects/osmlib/
+* http://osmlib.rubyforge.org/
+
+Dependencies:
+* libxml-ruby (for XML parsing)
+
+Dependencies are not all installed automatically when installing the gem
+packages because this breaks when the packages are already installed as
+Debian packages.
 
