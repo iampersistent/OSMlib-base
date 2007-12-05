@@ -47,13 +47,17 @@ module OSM
         end
 
         # Has this object any tags?
+        #
+        # call-seq: is_tagged?
+        #
         def is_tagged?
             ! @tags.empty?
         end
 
         # Return geometry of this feature.
         #
-        # call-seq: geometry() -> GeoRuby::SimpleFeatures::Geometry
+        # call-seq: geometry -> GeoRuby::SimpleFeatures::Geometry
+        #
         def geometry
             @feature
         end
@@ -96,7 +100,7 @@ module OSM
         end
 
         def _check_timestamp(timestamp)
-            if timestamp !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{2}:[0-9]{2}$/
+            if timestamp !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|([+-][0-9]{2}:[0-9]{2}))$/
                 raise ArgumentError, "Timestamp is in wrong format (must be 'yyyy-mm-ddThh:mm:ss[+-]mm:ss')"
             end
             timestamp

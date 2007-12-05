@@ -8,6 +8,15 @@ module OSM
 
         attr_accessor :version
 
+        # a hash of all nodes
+        attr_accessor :nodes
+
+        # a hash of all ways
+        attr_accessor :ways
+
+        # a hash of all relations
+        attr_accessor :relations
+
         # Create an empty database.
         def initialize
             clear

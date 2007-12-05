@@ -20,10 +20,6 @@ module OSM
             @context = nil
             @db = db
 
-            @nodes = Hash.new
-            @ways = Hash.new
-            @relations = Hash.new
-
             @sax_parser = XML::SaxParser.new
             @sax_parser.filename = filename
 
