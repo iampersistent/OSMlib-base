@@ -24,7 +24,7 @@ spec = Gem::Specification::new do |s|
     s.platform = Gem::Platform::RUBY
 
     s.name = 'osmlib-base'
-    s.version = '0.1.0'
+    s.version = '0.1.1'
     s.summary = 'Library for basic OpenStreetMap data handling'
     s.description = <<EOF
 Basic support for OpenStreetMap data model (Nodes, Ways, Relations and Tags). Parsing of OSM XML files.
