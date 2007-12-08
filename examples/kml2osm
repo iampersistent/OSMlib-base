@@ -1,0 +1,86 @@
+#!/usr/bin/ruby -w
+#
+#  kml2osm -- Convert a KML file into an OSM file
+#
+#  kml2osm reads the KML file named on the command line or STDIN
+#  and converts its contents into OSM data. Negative IDs are used
+#  so that the resulting .osm file can be loaded into JOSM and
+#  uploaded from there.
+#
+#  All placemarks are translated. If the placemark is a Point, a
+#  node is created, if the placemark is a LineString or Polygon,
+#  a way is created. If the placemark has a name, it is used as
+#  the name for the created OSM object.
+#
+#  The description of the KML placemark can contain lines of the
+#  form 'key=value'. Those will be converted into tags for the
+#  nodes and ways, respectively.
+#
+
+require 'rubygems'
+require 'builder'
+require 'rexml/document'
+
+$: << 'lib' << '../lib'
+require 'OSM/objects'
+require 'OSM/Database'
+
+db = OSM::Database.new
+
+nodes_by_coordinate = Hash.new
+
+if ARGV.size > 0
+    file = File.new(ARGV[0])
+else
+    file = STDIN
+end
+doc = REXML::Document.new(file)
+
+REXML::XPath.each(doc, '//Placemark') do |placemark|
+
+    if REXML::XPath.first(placemark, 'Point')
+        new_object = OSM::Node.new
+    else
+        new_object = OSM::Way.new
+    end
+    db << new_object
+
+    name_element = REXML::XPath.first(placemark, 'name')
+    if name_element
+        new_object.name = name_element.text
+    end
+
+    description_element = REXML::XPath.first(placemark, 'description')
+    if description_element
+        description_element.text.split("\n").each do |line|
+            (key, value) = line.split('=')
+            if ! value.nil?
+                new_object[key] = value
+            end
+        end
+    end
+
+    case new_object
+        when OSM::Node
+            (lon, lat, height) = REXML::XPath.first(placemark, 'Point/coordinates').text.split(',')
+            new_object.lon = lon
+            new_object.lat = lat
+        when OSM::Way
+            REXML::XPath.first(placemark, './/coordinates').text.split(' ').each do |c|
+                (lon, lat, height) = c.split(',')
+
+                node = nodes_by_coordinate["#{lon}:#{lat}"]
+                if node.nil?
+                    node = OSM::Node.new(nil, nil, nil, lon, lat)
+                    nodes_by_coordinate["#{lon}:#{lat}"] = node
+                    db << node
+                end
+                new_object.nodes << node
+            end
+    end
+end
+
+doc = Builder::XmlMarkup.new(:indent => 2, :target => STDOUT)
+doc.instruct!
+db.to_xml(doc, 'kml2osm')
+
