@@ -35,22 +35,24 @@ class WayTest < Test::Unit::TestCase
     end
 
     def test_init
-        assert_raise ArgumentError do
-            way = OSM::Way.new()
-        end
-        way = OSM::Way.new(4)
-        assert 4, way.id
-        assert_nil way.user
+        way1 = OSM::Way.new
+        way2 = OSM::Way.new
+        way3 = OSM::Way.new(4)
+        assert way1.id < 0
+        assert way2.id < 0
+        assert_not_equal way1.id, way2.id
+        assert_equal 4, way3.id
+        assert_nil way1.user
 
-        way.user = 'me'
-        assert_equal 'me', way.user
+        way1.user = 'me'
+        assert_equal 'me', way1.user
 
-        assert_nil way.timestamp
+        assert_nil way1.timestamp
         assert_raise ArgumentError do
-            way.timestamp = 'xxx'
+            way1.timestamp = 'xxx'
         end
-        way.timestamp = '2007-06-17T16:02:34+01:00'
-        assert_equal '2007-06-17T16:02:34+01:00', way.timestamp
+        way1.timestamp = '2007-06-17T16:02:34+01:00'
+        assert_equal '2007-06-17T16:02:34+01:00', way1.timestamp
     end
 
     def test_id

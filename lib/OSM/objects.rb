@@ -1,9 +1,14 @@
+# Contains classes for OpenStreetMap objects: OSM::OSMObject (virtual parent class), OSM::Node, OSM::Way, OSM::Relation, OSM::Member
 
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
     # This is a virtual parent class for the OSM objects Node, Way and Relation.
     class OSMObject
+
+        # To give out unique IDs to the objects we keep a counter that gets decreased every time we use it. See
+        # the #_next_id method.
+        @@id = 0
 
         # Unique ID
         attr_reader :id
@@ -14,25 +19,55 @@ module OSM
         # Last change of this object (as read from file, it is not updated by operations to this object)
         attr_reader :timestamp
 
-        # A Hash of tags
+        # Tags for this object
         attr_reader :tags
 
-        # The database this object is in
+        # The OSM::Database this object is in (if any)
         attr_accessor :db
 
         def initialize(id, user=nil, timestamp=nil) #:nodoc:
             raise NotImplementedError.new('OSMObject is a virtual base class for the Node, Way, and Relation classes') if self.class == OSM::OSMObject
 
-            @id = _check_id(id)
+            @id = id.nil? ? _next_id : _check_id(id)
             @user = user
             @timestamp = _check_timestamp(timestamp) unless timestamp.nil?
             @db = nil
-            @tags = Hash.new
+            @tags = Tags.new
         end
 
         # Set timestamp for this object.
         def timestamp=(timestamp)
             @timestamp = _check_timestamp(timestamp)
+        end
+
+        # The list of attributes for this object
+        def attribute_list # :nodoc:
+            [:id, :user, :timestamp]
+        end
+
+        # Returns a hash of all non-nil attributes of this object.
+        #
+        # Keys of this hash are <tt>:id</tt>, <tt>:user</tt>, and <tt>:timestamp</tt>. For a Node also <tt>:lon</tt> and <tt>:lat</tt>.
+        #
+        # call-seq: attributes -> Hash
+        #
+        def attributes
+            attrs = Hash.new
+            attribute_list.each do |attribute|
+                value = self.send(attribute)
+                attrs[attribute] = value unless value.nil?
+            end
+            attrs
+        end
+
+        # Get tag value
+        def [](key)
+            tags[key]
+        end
+
+        # Set tag
+        def []=(key, value)
+            tags[key] = value
         end
 
         # Add one or more tags to this object.
@@ -58,20 +93,38 @@ module OSM
         #
         # call-seq: geometry -> GeoRuby::SimpleFeatures::Geometry
         #
-        def geometry
+        def geometry # XXX needs rewriting
             @feature
         end
 
-        def shape(fields)
-            f = Hash.new
-            fields.each do |key, value|
-                f[key.to_s] = value
+        # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of this object and
+        # the given attributes.
+        #
+        # attributes:: Hash with attributes
+        #
+        # call-seq: shape(attributes) -> GeoRuby::Shp4r::ShpRecord
+        #
+        # Example:
+        #   node = Node(nil, nil, nil, 7.84, 54.34)
+        #   node.shape(:type => 'Pharmacy', :name => 'Hyde Park Pharmacy')
+        #
+        def shape(attributes)
+            fields = Hash.new
+            attributes.each do |key, value|
+                fields[key.to_s] = value
             end
-            GeoRuby::Shp4r::ShpRecord.new(geometry, f)
+            GeoRuby::Shp4r::ShpRecord.new(geometry, fields)
         end
 
         # All other methods are mapped so its easy to access tags: For instance obj.name
         # is the same as obj.tags['name']. This works for getting and setting tags.
+        #
+        #   node = OSM::Node.new
+        #   node.add_tags( 'highway' => 'residential', 'name' => 'Main Street' )
+        #   node.highway                   #=> 'residential'
+        #   node.highway = 'unclassified'  #=> 'unclassified'
+        #   node.name                      #=> 'Main Street'
+        #
         def method_missing(method, *args)
             if method.to_s.slice(-1, 1) == '='
                 if args.size != 1
@@ -87,6 +140,12 @@ module OSM
         end
  
         private
+
+        # Return next free ID
+        def _next_id
+            @@id -= 1
+            @@id
+        end
 
         def _check_id(id)
             if id.kind_of?(Integer)
@@ -138,7 +197,9 @@ module OSM
         attr_reader :lat
 
         # Create new Node object.
-        def initialize(id, user=nil, timestamp=nil, lon=nil, lat=nil)
+        #
+        # If +id+ is +nil+ a new unique negative ID will be allocated.
+        def initialize(id=nil, user=nil, timestamp=nil, lon=nil, lat=nil)
             @lon = _check_lon(lon) unless lon.nil?
             @lat = _check_lat(lat) unless lat.nil?
             super(id, user, timestamp)
@@ -154,12 +215,24 @@ module OSM
             @lat = _check_lat(lat)
         end
 
-        # Return string version of this Node object.
+        # List of attributes for a Node
+        def attribute_list
+            [:id, :user, :timestamp, :lon, :lat]
+        end
+
+        # Return string version of this node.
         # 
         # call-seq: to_s -> String
         #
         def to_s
             "#<OSM::Node id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\" lon=\"#{@lon}\" lat=\"#{@lat}\">"
+        end
+
+        # Return XML for this node. This method uses the XML Builder library. The only parameter is the builder object.
+        def to_xml(xml)
+            xml.node(attributes) do |xml|
+                tags.to_xml(xml)
+            end
         end
 
     end
@@ -171,7 +244,9 @@ module OSM
         attr_reader :nodes
 
         # Create new Way object.
-        def initialize(id, user=nil, timestamp=nil, nodes=[])
+        #
+        # If +id+ is +nil+ a new unique negative ID will be allocated.
+        def initialize(id=nil, user=nil, timestamp=nil, nodes=[])
             @nodes = nodes
             super(id, user, timestamp)
         end
@@ -184,6 +259,16 @@ module OSM
             "#<OSM::Way id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\">"
         end
 
+        # Return XML for this way. This method uses the Builder library. The only parameter ist the builder object.
+        def to_xml(xml)
+            xml.way(attributes) do |xml|
+                nodes.each do |node|
+                    xml.nd(:ref => node.id)
+                end
+                tags.to_xml(xml)
+            end
+        end
+
     end
 
     # OpenStreetMap Relation.
@@ -193,7 +278,9 @@ module OSM
         attr_reader :members
 
         # Create new Relation object.
-        def initialize(id, user=nil, timestamp=nil, members=[])
+        #
+        # If +id+ is +nil+ a new unique negative ID will be allocated.
+        def initialize(id=nil, user=nil, timestamp=nil, members=[])
             @members = members
             super(id, user, timestamp)
         end
@@ -207,12 +294,27 @@ module OSM
             self
         end
 
+        # This method is here to overwrite the shape method in the parent class.
+        def shape(attributes) # :nodoc:
+            raise NoMethodError.new("Relations don't have a shape, so you can't call Relation#shape")
+        end
+
         # Return string version of this Relation object.
         # 
         # call-seq: to_s -> String
         #
         def to_s
             "#<OSM::Relation id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\">"
+        end
+
+        # Return XML for this relation. This method uses the Builder library. The only parameter ist the builder object.
+        def to_xml(xml)
+            xml.relation(attributes) do |xml|
+                members.each do |member|
+                    member.to_xml(xml)
+                end
+                tags.to_xml(xml)
+            end
         end
 
     end
@@ -241,6 +343,23 @@ module OSM
             @type = type
             @ref  = ref.to_i
             @role = role
+        end
+
+        # Return XML for this way. This method uses the Builder library. The only parameter ist the builder object.
+        def to_xml(xml)
+            xml.member(:type => type, :ref => ref, :role => role)
+        end
+
+    end
+
+    # A collection of OSM tags which can be attached to a Node, Way, or Relation. It is a subclass of Hash.
+    class Tags < Hash
+
+        # Return XML for these tags. This method uses the Builder library. The only parameter ist the builder object.
+        def to_xml(xml)
+            each do |key, value|
+                xml.tag(:k => key, :v => value)
+            end
         end
 
     end

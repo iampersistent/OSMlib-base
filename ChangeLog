@@ -1,4 +1,14 @@
 
+trunk
+    * Tags in OSM objects are now stored as new type Tags, not Hash.
+    * New to_xml methods to dump OSM objects or a Database to XML using the
+      Builder Library.
+    * A newly created OSMObject without an ID will now get a unique negative ID.
+    * When an object is added to a Database and another object with the same
+      ID is already in there, the old object will be cleanly removed from
+      the database.
+    * New methods OSMObject#[] and OSMObject#[]= to access tags directly.
+
 0.1.1 2007-12-06
     Documentation updates
 

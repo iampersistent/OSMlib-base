@@ -1,4 +1,4 @@
-#  OSM/StreamParser.rb
+# Contains the OSM::StreamParser class.
 
 require 'rubygems'
 require 'xml/libxml'

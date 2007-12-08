@@ -42,4 +42,34 @@ class DatabaseTest < Test::Unit::TestCase
         end
     end
 
+    def test_overwrite_node
+        node1 = OSM::Node.new(89)
+        @db.add_node(node1)
+        assert_equal @db, node1.db
+        node2 = OSM::Node.new(89)
+        @db.add_node(node2)
+        assert_equal @db, node2.db
+        assert_nil node1.db
+    end
+
+    def test_overwrite_way
+        way1 = OSM::Way.new(89)
+        @db.add_way(way1)
+        assert_equal @db, way1.db
+        way2 = OSM::Way.new(89)
+        @db.add_way(way2)
+        assert_equal @db, way2.db
+        assert_nil way1.db
+    end
+
+    def test_overwrite_relation
+        relation1 = OSM::Relation.new(89)
+        @db.add_relation(relation1)
+        assert_equal @db, relation1.db
+        relation2 = OSM::Relation.new(89)
+        @db.add_relation(relation2)
+        assert_equal @db, relation2.db
+        assert_nil relation1.db
+    end
+
 end
