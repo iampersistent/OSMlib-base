@@ -102,4 +102,33 @@ class WayTest < Test::Unit::TestCase
         end
     end
 
+    def test_closed
+        way = OSM::Way.new
+        assert ! way.is_closed?
+        way.nodes << (node = OSM::Node.new(1)).id
+        assert ! way.is_closed?
+        way.nodes << OSM::Node.new(2).id
+        assert ! way.is_closed?
+        way.nodes << OSM::Node.new(3).id
+        assert ! way.is_closed?
+        way.nodes << node.id
+        assert way.is_closed?
+    end
+
+    def test_init_with_node_ids
+        node1 = OSM::Node.new
+        node2 = OSM::Node.new
+        way = OSM::Way.new(nil, nil, nil, [node1.id, node2.id])
+        assert_equal node1.id, way.nodes[0]
+        assert_equal node2.id, way.nodes[1]
+    end
+
+    def test_init_with_nodes
+        node1 = OSM::Node.new
+        node2 = OSM::Node.new
+        way = OSM::Way.new(nil, nil, nil, [node1, node2])
+        assert_equal node1.id, way.nodes[0]
+        assert_equal node2.id, way.nodes[1]
+    end
+
 end

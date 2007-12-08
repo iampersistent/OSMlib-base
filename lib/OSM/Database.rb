@@ -117,7 +117,7 @@ module OSM
                 when OSM::Relation then add_relation(object)
                 else raise ArgumentError.new('Can only add objects of classes OSM::Node, OSM::Way, or OSM::Relation')
             end
-            self
+            self    # return self so calls can be chained
         end
 
         # Dump database to XML. This uses the XML Builder library

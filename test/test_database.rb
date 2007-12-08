@@ -50,6 +50,13 @@ class DatabaseTest < Test::Unit::TestCase
         assert_nil relation.db
     end
 
+    def test_adding_multiple
+        @db << OSM::Node.new(1) << OSM::Node.new(2) << OSM::Way.new(3)
+        assert_kind_of OSM::Node, @db.get_node(1)
+        assert_kind_of OSM::Node, @db.get_node(2)
+        assert_kind_of OSM::Way,  @db.get_way(3)
+    end
+
     def test_adding_unknown_object
         assert_raise ArgumentError do
             @db << Hash.new
@@ -84,6 +91,20 @@ class DatabaseTest < Test::Unit::TestCase
         @db.add_relation(relation2)
         assert_equal @db, relation2.db
         assert_nil relation1.db
+    end
+
+    def test_way_node_objects
+        way = OSM::Way.new
+        assert_raise OSM::NoDatabaseError do
+            way.node_objects
+        end
+        @db << way
+        assert_equal [], way.node_objects
+        node = OSM::Node.new(19)
+        way.nodes << node.id
+        @db << node
+        assert_equal 19, way.nodes[0] 
+        assert_equal [node], way.node_objects
     end
 
 end

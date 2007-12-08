@@ -3,6 +3,18 @@
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
+    # This error is raised when an object is not associated with a OSM::Database but database access is needed.
+    class NoDatabaseError < StandardError
+    end
+
+    # This error is raised when a way that should be closed (i.e. first node equals last node) isn't
+    class NotClosedError < StandardError
+    end
+
+    # This error is raised when an OSM object is not associated with a geometry.
+    class NoGeometryError < StandardError
+    end
+
     # This is a virtual parent class for the OSM objects Node, Way and Relation.
     class OSMObject
 
@@ -83,7 +95,7 @@ module OSM
             new_tags.each do |k, v|
                 self.tags[k.to_s] = v
             end
-            self
+            self    # return self so calls can be chained
         end
 
         # Has this object any tags?
@@ -94,22 +106,19 @@ module OSM
             ! @tags.empty?
         end
 
-        # Return geometry of this feature.
-        #
-        # call-seq: geometry -> GeoRuby::SimpleFeatures::Geometry
-        #
-        def geometry # XXX needs rewriting
-            @feature
-        end
-
         # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of this object and
-        # the given attributes.
+        # the given attributes. Will raise a NoGeometryError if the object is not associated
+        # with a geometry.
+        #
+        # This only works if the GeoRuby library is included.
         #
         # attributes:: Hash with attributes
         #
         # call-seq: shape(attributes) -> GeoRuby::Shp4r::ShpRecord
         #
         # Example:
+        #   require 'rubygems'
+        #   require 'geo_ruby'
         #   node = Node(nil, nil, nil, 7.84, 54.34)
         #   node.shape(:type => 'Pharmacy', :name => 'Hyde Park Pharmacy')
         #
@@ -225,6 +234,20 @@ module OSM
             [:id, :user, :timestamp, :lon, :lat]
         end
 
+        # Create object of class GeoRuby::SimpleFeatures::Point with the coordinates of this node.
+        #
+        # Only works if the GeoRuby library is loaded.
+        #
+        #   require 'rubygems'
+        #   require 'geo_ruby'
+        #   geometry = OSM::Node.new(nil, nil, nil, 10.1, 20.2).geometry
+        #
+        # call-seq: geometry ->  GeoRuby::SimpleFeatures::Point
+        #
+        def geometry
+            GeoRuby::SimpleFeatures::Point.from_lon_lat(lon.to_f, lat.to_f)
+        end
+
         # Return string version of this node.
         # 
         # call-seq: to_s -> String
@@ -250,10 +273,76 @@ module OSM
 
         # Create new Way object.
         #
-        # If +id+ is +nil+ a new unique negative ID will be allocated.
+        # id:: ID of this way. If +nil+ a new unique negative ID will be allocated.
+        # user:: Username
+        # timestamp:: Timestamp of last change
+        # nodes:: Array of Node objects and/or node IDs
         def initialize(id=nil, user=nil, timestamp=nil, nodes=[])
-            @nodes = nodes
+            @nodes = nodes.collect{ |node| node.kind_of?(OSM::Node) ? node.id : node }
             super(id, user, timestamp)
+        end
+
+        # Is this way closed, i.e. are the first and last nodes the same?
+        #
+        # Returns false if the way doesn't contain any nodes or only one node.
+        #
+        # call-seq: is_closed? -> true or false
+        #
+        def is_closed?
+            return false if nodes.size < 2
+            nodes[0] == nodes[-1]
+        end
+
+        # Return an Array with all the node objects that are part of this way.
+        #
+        # Only works if the way and nodes are part of an OSM::Database.
+        #
+        # call-seq: node_objects -> Array of OSM::Node objects
+        #
+        def node_objects
+            raise OSM::NoDatabaseError.new("can't get node objects if the way is not in a OSM::Database") if @db.nil?
+            nodes.collect do |id|
+                @db.get_node(id)
+            end
+        end
+
+        # Create object of class GeoRuby::SimpleFeatures::LineString with the coordinates of the node in this way.
+        # Returns +nil+ if the way contain less than two nodes. Raises an OSM::NoDatabaseError exception if this way
+        # is not associated with an OSM::Database.
+        #
+        # Only works if the GeoRuby library is loaded.
+        #
+        # call-seq: linestring ->  GeoRuby::SimpleFeatures::LineString or nil
+        #
+        def linestring
+            return nil if nodes.size < 2
+            raise OSM::NoDatabaseError.new("can't create LineString from way if the way is not in a OSM::Database") if @db.nil?
+            GeoRuby::SimpleFeatures::LineString.from_coordinates(node_objects.collect{ |node| [node.lon, node.lat] })
+        end
+
+        # Create object of class GeoRuby::SimpleFeatures::Polygon with the coordinates of the node in this way.
+        # Returns +nil+ if the way contains less than three nodes. Raises an OSM::NoDatabaseError exception if this way
+        # is not associated with an OSM::Database. Raises an OSM::NotClosedError exception if this way is not closed.
+        #
+        # Only works if the GeoRuby library is loaded.
+        #
+        # call-seq: polygon ->  GeoRuby::SimpleFeatures::Polygon or nil
+        #
+        def polygon
+            return nil if nodes.size < 3
+            raise OSM::NoDatabaseError.new("can't create Polygon from way if the way is not in a OSM::Database") if @db.nil?
+            raise OSM::NotClosedError.new("way is not closed so it can't be represented as Polygon") unless is_closed?
+            GeoRuby::SimpleFeatures::Polygon.from_coordinates([node_objects.collect{ |node| [node.lon, node.lat] }])
+        end
+
+        # Currently the same as the linestring method. This might change in the future to return a Polygon in some cases.
+        #
+        # Only works if the GeoRuby library is loaded.
+        #
+        # call-seq: geometry ->  GeoRuby::SimpleFeatures::LineString or nil
+        #
+        def geometry
+            linestring
         end
 
         # Return string version of this Way object.
@@ -294,14 +383,17 @@ module OSM
         #
         # call-seq: relation << [member1, member2, ...] -> Relation
         #
-        def <<(*new_members)
+        def <<(*new_members) # XXX
             @members.push(*new_members)
             self
         end
 
-        # This method is here to overwrite the shape method in the parent class.
-        def shape(attributes) # :nodoc:
-            raise NoMethodError.new("Relations don't have a shape, so you can't call Relation#shape")
+        # Raises a NoGeometryError.
+        #
+        # Future versions of this library may recognize certain relations that do have a geometry
+        # (such as Multipolygon relations) and do the right thing.
+        def geometry
+            raise NoGeometryError.new("Relations don't have a geometry")
         end
 
         # Return string version of this Relation object.

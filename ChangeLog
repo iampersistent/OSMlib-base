@@ -8,6 +8,8 @@ trunk
       ID is already in there, the old object will be cleanly removed from
       the database.
     * New methods OSMObject#[] and OSMObject#[]= to access tags directly.
+	* Improved geometry support
+	* Many more tests
 
 0.1.1 2007-12-06
     Documentation updates
