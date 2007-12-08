@@ -4,48 +4,23 @@ require 'test/unit'
 
 class NodeTest < Test::Unit::TestCase
 
-    def setup
-        @node1 = OSM::Node.new(17, 'somebody', '2007-02-20T10:29:49+00:00', 8.5, 47.5)
-        @node2 = OSM::Node.new(25, 'somebodyelse', '2007-03-20T00:00:00Z')
-    end
-
     def test_create
-        assert_kind_of OSM::Node, @node1
-        assert_equal 17, @node1.id
-        assert_equal 'somebody', @node1.user
-        assert_equal '2007-02-20T10:29:49+00:00', @node1.timestamp
-        assert_equal '#<OSM::Node id="17" user="somebody" timestamp="2007-02-20T10:29:49+00:00" lon="8.5" lat="47.5">', @node1.to_s
+        node = OSM::Node.new(17, 'somebody', '2007-02-20T10:29:49+00:00', 8.5, 47.5)
+        assert_kind_of OSM::Node, node
+        assert_equal 17, node.id
+        assert_equal 'somebody', node.user
+        assert_equal '2007-02-20T10:29:49+00:00', node.timestamp
+        assert_equal '#<OSM::Node id="17" user="somebody" timestamp="2007-02-20T10:29:49+00:00" lon="8.5" lat="47.5">', node.to_s
 
-        assert_kind_of Hash, @node1.tags
-        assert @node1.tags.empty?
-        assert_nil @node1.tags['foo']
+        assert_kind_of Hash, node.tags
+        assert node.tags.empty?
+        assert_nil node.tags['foo']
 
         hash = {:id => 17, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00', :lon => '8.5', :lat => '47.5'}
-        assert_equal hash, @node1.attributes
-        hash = {:id => 25, :user => 'somebodyelse', :timestamp => '2007-03-20T00:00:00Z'}
-        assert_equal hash, @node2.attributes
+        assert_equal hash, node.attributes
     end
 
-    def test_tags
-        assert @node1.tags.empty?
-
-        @node1.tags['tourism'] = 'hotel'
-        assert_equal 'hotel', @node1.tags['tourism']
-        assert_equal 'hotel', @node1['tourism']
-        assert_nil @node1.tags['doesnt_exist']
-        assert ! @node1.tags.empty?
-
-        @node1['name'] = 'Hotel Alfredo'
-        assert_equal 'Hotel Alfredo', @node1['name']
-
-        @node2.add_tags('amenity' => 'fuel', 'name' => 'ESSO')
-        assert_equal 'fuel', @node2.tags['amenity']
-        assert_equal 'ESSO', @node2.tags['name']
-        assert_equal 'ESSO', @node2.name
-        assert_nil @node2.tags['doesnt_exist']
-    end
-
-    def test_init
+    def test_init_id
         node1 = OSM::Node.new
         node2 = OSM::Node.new
         node3 = OSM::Node.new(4)
@@ -53,20 +28,64 @@ class NodeTest < Test::Unit::TestCase
         assert node2.id < 0
         assert_not_equal node1.id, node2.id
         assert_equal 4, node3.id
-        assert_nil node1.user
-
-        node1.user = 'me'
-        assert_equal 'me', node1.user
-
-        assert_nil node1.timestamp
-        assert_raise ArgumentError do
-            node1.timestamp = 'xxx'
-        end
-        node1.timestamp = '2007-06-17T16:02:34+01:00'
-        assert_equal '2007-06-17T16:02:34+01:00', node1.timestamp
     end
 
-    def test_id
+    def test_set_id
+        node = OSM::Node.new
+        assert_raise NotImplementedError do
+            node.id = 1
+        end
+    end
+
+    def test_set_user
+        node = OSM::Node.new
+        assert_nil node.user
+        node.user = 'me'
+        assert_equal 'me', node.user
+    end
+
+    def test_set_timestamp
+        node = OSM::Node.new
+        assert_nil node.timestamp
+        assert_raise ArgumentError do
+            node.timestamp = 'xxx'
+        end
+        node.timestamp = '2007-06-17T16:02:34+01:00'
+        assert_equal '2007-06-17T16:02:34+01:00', node.timestamp
+    end
+
+    def test_tags1
+        node = OSM::Node.new
+        assert node.tags.empty?
+        assert ! node.is_tagged?
+
+        node.tags['tourism'] = 'hotel'
+        assert ! node.tags.empty?
+        assert node.is_tagged?
+
+        assert_equal 'hotel', node.tags['tourism']
+        assert_equal 'hotel', node['tourism']
+        assert_equal 'hotel', node.tourism
+        assert_nil node.tags['doesnt_exist']
+
+        node['name'] = 'Hotel Alfredo'
+        assert_equal 'Hotel Alfredo', node['name']
+
+        assert_equal 2, node.tags.size
+    end
+
+    def test_tag2
+        node = OSM::Node.new
+        node.add_tags('amenity' => 'fuel', 'name' => 'ESSO')
+
+        assert_equal 'fuel', node.tags['amenity']
+        assert_equal 'ESSO', node.tags['name']
+        assert_equal 'ESSO', node.name
+
+        assert_equal 2, node.tags.size
+    end
+
+    def test_id_type
         assert_kind_of OSM::Node, OSM::Node.new('123')
         assert_kind_of OSM::Node, OSM::Node.new(123)
         assert_raise ArgumentError do
@@ -88,10 +107,23 @@ class NodeTest < Test::Unit::TestCase
         assert_raise ArgumentError do
             node.lat = Hash.new
         end
+        assert_nil node.lat
         node.lat = '123.45'
         assert_equal '123.45', node.lat
         node.lat = 123.45
         assert_equal '123.45', node.lat
+    end
+
+    def test_lon
+        node = OSM::Node.new(123)
+        assert_raise ArgumentError do
+            node.lon = Hash.new
+        end
+        assert_nil node.lon
+        node.lon = '123.45'
+        assert_equal '123.45', node.lon
+        node.lon = 123.45
+        assert_equal '123.45', node.lon
     end
 
 end

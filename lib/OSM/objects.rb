@@ -25,7 +25,7 @@ module OSM
         # The OSM::Database this object is in (if any)
         attr_accessor :db
 
-        def initialize(id, user=nil, timestamp=nil) #:nodoc:
+        def initialize(id, user, timestamp) #:nodoc:
             raise NotImplementedError.new('OSMObject is a virtual base class for the Node, Way, and Relation classes') if self.class == OSM::OSMObject
 
             @id = id.nil? ? _next_id : _check_id(id)
@@ -33,6 +33,11 @@ module OSM
             @timestamp = _check_timestamp(timestamp) unless timestamp.nil?
             @db = nil
             @tags = Tags.new
+        end
+
+        # Create an error when somebody tries to set the ID. (We need this here because otherwise method_missing will be called.)
+        def id=(id) # :nodoc:
+            raise NotImplementedError.new('id can not be changed once the object was created')
         end
 
         # Set timestamp for this object.

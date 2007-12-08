@@ -33,7 +33,9 @@ module OSM
         #
         def initialize(version = DEFAULT_API_VERSION)
             @version = version
-            clear
+            @nodes     = Hash.new
+            @ways      = Hash.new
+            @relations = Hash.new
         end
 
         # Delete all nodes, ways and relations from the database.
@@ -43,6 +45,10 @@ module OSM
         # call-seq: clear
         #
         def clear
+            @nodes.each_value{     |obj| obj.db = nil }
+            @ways.each_value{      |obj| obj.db = nil }
+            @relations.each_value{ |obj| obj.db = nil }
+
             @nodes     = Hash.new
             @ways      = Hash.new
             @relations = Hash.new

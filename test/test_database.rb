@@ -34,6 +34,20 @@ class DatabaseTest < Test::Unit::TestCase
         @db << node1
         assert_equal node1, @db.get_node(42)
         assert_equal @db, node1.db
+
+        assert_equal 2, @db.nodes.size
+        assert_equal 1, @db.ways.size
+        assert_equal 1, @db.relations.size
+
+        @db.clear
+        assert_equal 0, @db.nodes.size
+        assert_equal 0, @db.ways.size
+        assert_equal 0, @db.relations.size
+
+        assert_nil node.db
+        assert_nil node1.db
+        assert_nil way.db
+        assert_nil relation.db
     end
 
     def test_adding_unknown_object

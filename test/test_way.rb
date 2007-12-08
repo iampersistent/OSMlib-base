@@ -4,37 +4,23 @@ require 'test/unit'
 
 class WayTest < Test::Unit::TestCase
 
-    def setup
-        @way1 = OSM::Way.new(123, 'somebody', '2007-02-20T10:29:49+00:00')
-        @way2 = OSM::Way.new(1111, 'somebodyelse', '2007-04-20T10:29:49+00:00')
-    end
-
     def test_create
-        assert_kind_of OSM::Way, @way1
-        assert_equal 123, @way1.id
-        assert_equal 'somebody', @way1.user
-        assert_equal '2007-02-20T10:29:49+00:00', @way1.timestamp
-        assert_kind_of Hash, @way1.tags
-        assert @way1.tags.empty?
-        assert_nil @way1.tags['foo']
+        way = OSM::Way.new(123, 'somebody', '2007-02-20T10:29:49+00:00')
+        assert_kind_of OSM::Way, way
+        assert_equal 123, way.id
+        assert_equal 'somebody', way.user
+        assert_equal '2007-02-20T10:29:49+00:00', way.timestamp
+        assert_equal '#<OSM::Way id="123" user="somebody" timestamp="2007-02-20T10:29:49+00:00">', way.to_s
+
+        assert_kind_of Hash, way.tags
+        assert way.tags.empty?
+        assert_nil way.tags['foo']
+
+        hash = {:id => 123, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00'}
+        assert_equal hash, way.attributes
     end
 
-    def test_tags
-        assert @way1.tags.empty?
-
-        @way1.tags['highway'] = 'residential'
-        assert_equal 'residential', @way1.tags['highway']
-        assert_nil @way1.tags['doesnt_exist']
-        assert ! @way1.tags.empty?
-
-        @way2.add_tags('amenity' => 'fuel', 'name' => 'ESSO')
-        assert_equal 'fuel', @way2.tags['amenity']
-        assert_equal 'ESSO', @way2.tags['name']
-        assert_equal 'ESSO', @way2.name
-        assert_nil @way2.tags['doesnt_exist']
-    end
-
-    def test_init
+    def test_init_id
         way1 = OSM::Way.new
         way2 = OSM::Way.new
         way3 = OSM::Way.new(4)
@@ -42,20 +28,64 @@ class WayTest < Test::Unit::TestCase
         assert way2.id < 0
         assert_not_equal way1.id, way2.id
         assert_equal 4, way3.id
-        assert_nil way1.user
-
-        way1.user = 'me'
-        assert_equal 'me', way1.user
-
-        assert_nil way1.timestamp
-        assert_raise ArgumentError do
-            way1.timestamp = 'xxx'
-        end
-        way1.timestamp = '2007-06-17T16:02:34+01:00'
-        assert_equal '2007-06-17T16:02:34+01:00', way1.timestamp
     end
 
-    def test_id
+    def test_set_id
+        way = OSM::Way.new
+        assert_raise NotImplementedError do
+            way.id = 1
+        end
+    end
+
+    def test_set_user
+        way = OSM::Way.new
+        assert_nil way.user
+        way.user = 'me'
+        assert_equal 'me', way.user
+    end
+
+    def test_set_timestamp
+        way = OSM::Way.new
+        assert_nil way.timestamp
+        assert_raise ArgumentError do
+            way.timestamp = 'xxx'
+        end
+        way.timestamp = '2007-06-17T16:02:34+01:00'
+        assert_equal '2007-06-17T16:02:34+01:00', way.timestamp
+    end
+
+    def test_tags1
+        way = OSM::Way.new
+        assert way.tags.empty?
+        assert ! way.is_tagged?
+
+        way.tags['highway'] = 'residential'
+        assert ! way.tags.empty?
+        assert way.is_tagged?
+
+        assert_equal 'residential', way.tags['highway']
+        assert_equal 'residential', way['highway']
+        assert_equal 'residential', way.highway
+        assert_nil way.tags['doesnt_exist']
+
+        way['name'] = 'Main Street'
+        assert_equal 'Main Street', way['name']
+
+        assert_equal 2, way.tags.size
+    end
+
+    def test_tags2
+        way = OSM::Way.new
+        way.add_tags('amenity' => 'fuel', 'name' => 'ESSO')
+
+        assert_equal 'fuel', way.tags['amenity']
+        assert_equal 'ESSO', way.tags['name']
+        assert_equal 'ESSO', way.name
+
+        assert_equal 2, way.tags.size
+    end
+
+    def test_id_type
         assert_kind_of OSM::Way, OSM::Way.new('123')
         assert_kind_of OSM::Way, OSM::Way.new(123)
         assert_raise ArgumentError do
@@ -71,4 +101,5 @@ class WayTest < Test::Unit::TestCase
             OSM::Way.new(Hash.new)
         end
     end
+
 end
