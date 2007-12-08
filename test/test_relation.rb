@@ -102,4 +102,34 @@ class RelationTest < Test::Unit::TestCase
         end
     end
 
+    def test_magic_add_hash
+        relation = OSM::Relation.new
+        relation << { 'a' => 'b' } << { 'c' => 'd' }
+        assert_equal 'b', relation.tags['a']
+        assert_equal 'd', relation.tags['c']
+    end
+
+    def test_magic_add_tags
+        relation = OSM::Relation.new
+        tags = OSM::Tags.new
+        tags['a'] = 'b'
+        relation << tags
+        assert_equal 'b', relation.tags['a']
+    end
+
+    def test_magic_add_array
+        relation = OSM::Relation.new
+        relation << [{'a' => 'b'}, {'c' => 'd'}]
+        assert_equal 'b', relation.tags['a']
+        assert_equal 'd', relation.tags['c']
+    end
+
+    def test_magic_add_node
+        relation = OSM::Relation.new
+        relation << OSM::Member.new('node', 21, 'foo')
+        assert ! relation.is_tagged?
+        assert_equal 1, relation.members.size
+        assert_equal 'node', relation.members[0].type
+    end
+
 end

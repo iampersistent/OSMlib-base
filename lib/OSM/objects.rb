@@ -234,6 +234,29 @@ module OSM
             [:id, :user, :timestamp, :lon, :lat]
         end
 
+        # Add one or more tags to this node.
+        #
+        # The argument can be one of the following:
+        #
+        # * If the argument is a Hash or an OSM::Tags object, those tags are added.
+        # * If the argument is an Array the function is called recursively, i.e. all items in the Array are added.
+        #
+        # Returns the node to allow chaining.
+        #
+        # call-seq: node << something -> Node
+        #
+        def <<(stuff)
+            case stuff
+                when Array  # call this method recursively
+                    stuff.each do |item|
+                        self << item
+                    end
+                else
+                    tags.merge!(stuff)
+            end
+            self    # return self to allow chaining
+        end
+
         # Create object of class GeoRuby::SimpleFeatures::Point with the coordinates of this node.
         #
         # Only works if the GeoRuby library is loaded.
@@ -280,6 +303,37 @@ module OSM
         def initialize(id=nil, user=nil, timestamp=nil, nodes=[])
             @nodes = nodes.collect{ |node| node.kind_of?(OSM::Node) ? node.id : node }
             super(id, user, timestamp)
+        end
+
+        # Add one or more tags or nodes to this way.
+        #
+        # The argument can be one of the following:
+        #
+        # * If the argument is a Hash or an OSM::Tags object, those tags are added.
+        # * If the argument is an OSM::Node object, its ID is added to the list of node IDs.
+        # * If the argument is an Integer or String containing an Integer, this ID is added to the list of node IDs.
+        # * If the argument is an Array the function is called recursively, i.e. all items in the Array are added.
+        #
+        # Returns the way to allow chaining.
+        #
+        # call-seq: way << something -> Way
+        #
+        def <<(stuff)
+            case stuff
+                when Array  # call this method recursively
+                    stuff.each do |item|
+                        self << item
+                    end
+                when OSM::Node
+                    nodes << stuff.id
+                when String
+                    nodes << stuff.to_i
+                when Integer
+                    nodes << stuff
+                else
+                    tags.merge!(stuff)
+            end
+            self    # return self to allow chaining
         end
 
         # Is this way closed, i.e. are the first and last nodes the same?
@@ -379,14 +433,32 @@ module OSM
             super(id, user, timestamp)
         end
 
-        # Add one or more members to this relation.
+        # Add one or more tags or members to this relation.
         #
-        # call-seq: relation << [member1, member2, ...] -> Relation
+        # The argument can be one of the following:
         #
-        def <<(*new_members) # XXX
-            @members.push(*new_members)
-            self
+        # * If the argument is a Hash or an OSM::Tags object, those tags are added.
+        # * If the argument is an OSM::Member object, it is added to the relation
+        # * If the argument is an Array the function is called recursively, i.e. all items in the Array are added.
+        #
+        # Returns the relation to allow chaining.
+        #
+        # call-seq: relation << something -> Relation
+        #
+        def <<(stuff)
+            case stuff
+                when Array  # call this method recursively
+                    stuff.each do |item|
+                        self << item
+                    end
+                when OSM::Member
+                    members << stuff
+                else
+                    tags.merge!(stuff)
+            end
+            self    # return self to allow chaining
         end
+
 
         # Raises a NoGeometryError.
         #

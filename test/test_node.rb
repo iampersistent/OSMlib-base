@@ -126,4 +126,26 @@ class NodeTest < Test::Unit::TestCase
         assert_equal '123.45', node.lon
     end
 
+    def test_magic_add_hash
+        node = OSM::Node.new
+        node << { 'a' => 'b' } << { 'c' => 'd' }
+        assert_equal 'b', node.tags['a']
+        assert_equal 'd', node.tags['c']
+    end
+
+    def test_magic_add_tags
+        node = OSM::Node.new
+        tags = OSM::Tags.new
+        tags['a'] = 'b'
+        node << tags
+        assert_equal 'b', node.tags['a']
+    end
+
+    def test_magic_add_array
+        node = OSM::Node.new
+        node << [{'a' => 'b'}, {'c' => 'd'}]
+        assert_equal 'b', node.tags['a']
+        assert_equal 'd', node.tags['c']
+    end
+
 end

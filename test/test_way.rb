@@ -131,4 +131,33 @@ class WayTest < Test::Unit::TestCase
         assert_equal node2.id, way.nodes[1]
     end
 
+    def test_magic_add_hash
+        way = OSM::Way.new
+        way << { 'a' => 'b' } << { 'c' => 'd' }
+        assert_equal 'b', way.tags['a']
+        assert_equal 'd', way.tags['c']
+    end
+
+    def test_magic_add_tags
+        way = OSM::Way.new
+        tags = OSM::Tags.new
+        tags['a'] = 'b'
+        way << tags
+        assert_equal 'b', way.tags['a']
+    end
+
+    def test_magic_add_array
+        way = OSM::Way.new
+        way << [{'a' => 'b'}, {'c' => 'd'}]
+        assert_equal 'b', way.tags['a']
+        assert_equal 'd', way.tags['c']
+    end
+
+    def test_magic_add_node
+        way = OSM::Way.new
+        way << 17 << 21 << "22" << OSM::Node.new(23)
+        assert ! way.is_tagged?
+        assert_equal [17, 21, 22, 23], way.nodes
+    end
+
 end
