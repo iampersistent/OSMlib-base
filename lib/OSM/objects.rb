@@ -140,16 +140,17 @@ module OSM
         #   node.name                      #=> 'Main Street'
         #
         def method_missing(method, *args)
-            if method.to_s.slice(-1, 1) == '='
+            methodname = method.to_s
+            if methodname.slice(-1, 1) == '='
                 if args.size != 1
                     raise ArgumentError.new("wrong number of arguments (#{args.size} for 1)")
                 end
-                tags[method.to_s.chop] = args[0]
+                tags[methodname.chop] = args[0]
             else
-                if args.size > 0
+                if args.size != 0
                     raise ArgumentError.new("wrong number of arguments (#{args.size} for 0)")
                 end
-                tags[method.to_s]
+                tags[methodname]
             end
         end
  
