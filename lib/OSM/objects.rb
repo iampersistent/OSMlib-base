@@ -372,7 +372,7 @@ module OSM
         def linestring
             return nil if nodes.size < 2
             raise OSM::NoDatabaseError.new("can't create LineString from way if the way is not in a OSM::Database") if @db.nil?
-            GeoRuby::SimpleFeatures::LineString.from_coordinates(node_objects.collect{ |node| [node.lon, node.lat] })
+            GeoRuby::SimpleFeatures::LineString.from_coordinates(node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] })
         end
 
         # Create object of class GeoRuby::SimpleFeatures::Polygon with the coordinates of the node in this way.
@@ -387,7 +387,7 @@ module OSM
             return nil if nodes.size < 3
             raise OSM::NoDatabaseError.new("can't create Polygon from way if the way is not in a OSM::Database") if @db.nil?
             raise OSM::NotClosedError.new("way is not closed so it can't be represented as Polygon") unless is_closed?
-            GeoRuby::SimpleFeatures::Polygon.from_coordinates([node_objects.collect{ |node| [node.lon, node.lat] }])
+            GeoRuby::SimpleFeatures::Polygon.from_coordinates([node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] }])
         end
 
         # Currently the same as the linestring method. This might change in the future to return a Polygon in some cases.
