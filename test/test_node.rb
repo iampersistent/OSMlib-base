@@ -85,6 +85,17 @@ class NodeTest < Test::Unit::TestCase
         assert_equal 2, node.tags.size
     end
 
+    def test_tag_boolean
+        node = OSM::Node.new
+        node.add_tags('true1' => 'true', 'true2' => 'yes', 'true3' => '1', 'false1' => 'x', 'false2' => '0')
+
+        assert node.true1?
+        assert node.true2?
+        assert node.true3?
+        assert ! node.false1?
+        assert ! node.false2?
+    end
+
     def test_id_type
         assert_kind_of OSM::Node, OSM::Node.new('123')
         assert_kind_of OSM::Node, OSM::Node.new(123)

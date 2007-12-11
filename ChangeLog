@@ -11,6 +11,7 @@ trunk
     * Improved geometry support
     * Many more tests
     * Added magic << methods to Node, Way, and Relation classes
+    * Added missing method "key?" to check boolean tags
 
 0.1.1 2007-12-06
     Documentation updates

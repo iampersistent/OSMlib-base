@@ -139,6 +139,13 @@ module OSM
         #   node.highway = 'unclassified'  #=> 'unclassified'
         #   node.name                      #=> 'Main Street'
         #
+        # In addition methods of the form <tt>key?</tt> are used to check boolean tags.
+        # For instance +oneway+ can be 'true' or 'yes' or '1', all meaning the same.
+        #
+        #   way.oneway?
+        #
+        # will check this. It returns true if the value of this key is either 'true',
+        # 'yes' or '1'.
         def method_missing(method, *args)
             methodname = method.to_s
             if methodname.slice(-1, 1) == '='
@@ -146,6 +153,11 @@ module OSM
                     raise ArgumentError.new("wrong number of arguments (#{args.size} for 1)")
                 end
                 tags[methodname.chop] = args[0]
+            elsif methodname.slice(-1, 1) == '?'
+                if args.size != 0
+                    raise ArgumentError.new("wrong number of arguments (#{args.size} for 0)")
+                end
+                tags[methodname.chop] =~ /^(true|yes|1)$/
             else
                 if args.size != 0
                     raise ArgumentError.new("wrong number of arguments (#{args.size} for 0)")
