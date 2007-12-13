@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
-require 'rake/clean'
+#require 'rake/clean'
 
 task :default => :test
 
@@ -10,6 +10,12 @@ desc "Run the tests"
 Rake::TestTask::new do |t|
     t.test_files = FileList['test/test*.rb']
     t.verbose = true
+end
+
+desc 'Measures test coverage'
+task :rcov do
+    rm_f "coverage"
+    system("rcov test/test_*rb")
 end
 
 desc "Generate the documentation"

@@ -10,8 +10,8 @@ module OSM
     # deleted from the database and the new one will be added.
     class Database
 
-        DEFAULT_API_VERSION = '0.5'
-        DEFAULT_XML_GENERATOR = 'Ruby-OSMLib'
+        @@DEFAULT_API_VERSION = '0.5'
+        @@DEFAULT_XML_GENERATOR = 'Ruby-OSMLib'
 
         # OpenStreetMap API version of this database
         attr_accessor :version
@@ -27,11 +27,11 @@ module OSM
 
         # Create an empty database.
         #
-        # version:: OpenStreetMap API Version (String, Default: DEFAULT_API_VERSION)
+        # version:: OpenStreetMap API Version (String, Default: @@DEFAULT_API_VERSION)
         #
         # call-seq: OSM::Database.new(version) -> OSM::Database
         #
-        def initialize(version = DEFAULT_API_VERSION)
+        def initialize(version = @@DEFAULT_API_VERSION)
             @version = version
             @nodes     = Hash.new
             @ways      = Hash.new
@@ -123,7 +123,7 @@ module OSM
         # Dump database to XML. This uses the XML Builder library
         #
         # doc:: Builder::XmlMarkup object
-        # generator:: Name of generator to put in generator attribute of osm element (String, Default: DEFAULT_XML_GENERATOR)
+        # generator:: Name of generator to put in generator attribute of osm element (String, Default: @@DEFAULT_XML_GENERATOR)
         #
         # This method is used like this:
         #
@@ -133,7 +133,7 @@ module OSM
         #   doc.instruct!
         #   db.to_xml(doc, 'test')
         #
-        def to_xml(doc, generator=DEFAULT_XML_GENERATOR)
+        def to_xml(doc, generator=@@DEFAULT_XML_GENERATOR)
             doc.osm(:generator => generator, :version => version) do |xml|
                 nodes.each_value do |node|
                     node.to_xml(xml)
