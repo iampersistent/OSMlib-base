@@ -90,4 +90,11 @@ class GeometryTest < Test::Unit::TestCase
 
     end
 
+    def test_relation_geometry
+        rel = OSM::Relation.new
+        assert_raise OSM::NoGeometryError do
+            rel.geometry
+        end
+    end
+
 end

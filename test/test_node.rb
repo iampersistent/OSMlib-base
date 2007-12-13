@@ -85,6 +85,22 @@ class NodeTest < Test::Unit::TestCase
         assert_equal 2, node.tags.size
     end
 
+    def test_method_missing
+        node = OSM::Node.new
+        assert_equal 'foo', node.bar = 'foo'
+        assert_equal 'foo', node.bar
+        assert ! node.bar?
+        assert_raise ArgumentError do
+            node.call(:bar=, 'x', 'y')
+        end
+        assert_raise ArgumentError do
+            node.call(:bar?, 'x')
+        end
+        assert_raise ArgumentError do
+            node.call(:bar, 'x')
+        end
+    end
+
     def test_tag_boolean
         node = OSM::Node.new
         node.add_tags('true1' => 'true', 'true2' => 'yes', 'true3' => '1', 'false1' => 'x', 'false2' => '0')
