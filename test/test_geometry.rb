@@ -19,9 +19,9 @@ class GeometryTest < Test::Unit::TestCase
 
     def test_node_geometry_nil
         node = OSM::Node.new(1)
-        assert_kind_of GeoRuby::SimpleFeatures::Point, node.geometry
-        assert_equal 0.0, node.geometry.lon
-        assert_equal 0.0, node.geometry.lat
+        assert_raise OSM::GeometryError do
+            node.geometry
+        end
     end
 
     def test_node_shape

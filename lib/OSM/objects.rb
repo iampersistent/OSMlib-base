@@ -112,7 +112,8 @@ module OSM
 
         # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of this object and
         # the given attributes. Will raise a NoGeometryError if the object is not associated
-        # with a geometry.
+        # with a geometry. Will raise a GeometryError if there is insufficient data to
+        # create a geometry such as not enough nodes in a way.
         #
         # This only works if the GeoRuby library is included.
         #
