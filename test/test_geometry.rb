@@ -36,9 +36,16 @@ class GeometryTest < Test::Unit::TestCase
 
     def test_way_geometry_nil
         way = OSM::Way.new(1)
-        assert_nil way.linestring
-        assert_nil way.polygon
-        assert_nil way.geometry
+        assert_raise OSM::GeometryError do
+            way.linestring
+        end
+        assert_raise OSM::GeometryError do
+            way.polygon
+        end
+        assert_raise OSM::GeometryError do
+            way.geometry
+        end
+
     end
 
     def test_way_geometry_fail
@@ -61,20 +68,34 @@ class GeometryTest < Test::Unit::TestCase
         @db << (node2 = OSM::Node.new(nil, nil, nil, 0, 10))
         @db << (node3 = OSM::Node.new(nil, nil, nil, 10, 10))
 
-        assert_nil way.linestring
-        assert_nil way.polygon
-        assert_nil way.geometry
+        assert_raise OSM::GeometryError do
+            way.linestring
+        end
+        assert_raise OSM::GeometryError do
+            way.polygon
+        end
+        assert_raise OSM::GeometryError do
+            way.geometry
+        end
 
         way.nodes << node1.id
 
-        assert_nil way.linestring
-        assert_nil way.polygon
-        assert_nil way.geometry
+        assert_raise OSM::GeometryError do
+            way.linestring
+        end
+        assert_raise OSM::GeometryError do
+            way.polygon
+        end
+        assert_raise OSM::GeometryError do
+            way.geometry
+        end
 
         way.nodes << node2.id
 
         assert_kind_of GeoRuby::SimpleFeatures::LineString, way.linestring
-        assert_nil way.polygon
+        assert_raise OSM::GeometryError do
+            way.polygon
+        end
         assert_kind_of GeoRuby::SimpleFeatures::LineString, way.geometry
 
         way.nodes << node3.id

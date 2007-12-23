@@ -15,6 +15,10 @@ module OSM
     class NoGeometryError < StandardError
     end
 
+    # This error is raised when an OSM object can't be turned into a proper geometry. Happens if way has not enough nodes.
+    class GeometryError < StandardError
+    end
+
     # This is a virtual parent class for the OSM objects Node, Way and Relation.
     class OSMObject
 
@@ -271,6 +275,7 @@ module OSM
         end
 
         # Create object of class GeoRuby::SimpleFeatures::Point with the coordinates of this node.
+        # Raises an OSM::GeometryError exception if the coordinates are not set.
         #
         # Only works if the GeoRuby library is loaded.
         #
@@ -281,6 +286,7 @@ module OSM
         # call-seq: geometry ->  GeoRuby::SimpleFeatures::Point
         #
         def geometry
+            raise OSM::GeometryError.new("coordinates missing") if lon.nil? || lat.nil? || lon == '' || lat == ''
             GeoRuby::SimpleFeatures::Point.from_lon_lat(lon.to_f, lat.to_f)
         end
 
@@ -374,7 +380,7 @@ module OSM
         end
 
         # Create object of class GeoRuby::SimpleFeatures::LineString with the coordinates of the node in this way.
-        # Returns +nil+ if the way contain less than two nodes. Raises an OSM::NoDatabaseError exception if this way
+        # Raises a OSM::GeometryError exception if the way contain less than two nodes. Raises an OSM::NoDatabaseError exception if this way
         # is not associated with an OSM::Database.
         #
         # Only works if the GeoRuby library is loaded.
@@ -382,13 +388,13 @@ module OSM
         # call-seq: linestring ->  GeoRuby::SimpleFeatures::LineString or nil
         #
         def linestring
-            return nil if nodes.size < 2
+            raise OSM::GeometryError.new("way with less then two nodes can't be turned into a linestring") if nodes.size < 2
             raise OSM::NoDatabaseError.new("can't create LineString from way if the way is not in a OSM::Database") if @db.nil?
             GeoRuby::SimpleFeatures::LineString.from_coordinates(node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] })
         end
 
         # Create object of class GeoRuby::SimpleFeatures::Polygon with the coordinates of the node in this way.
-        # Returns +nil+ if the way contains less than three nodes. Raises an OSM::NoDatabaseError exception if this way
+        # Raises a OSM::GeometryError exception if the way contain less than three nodes. Raises an OSM::NoDatabaseError exception if this way
         # is not associated with an OSM::Database. Raises an OSM::NotClosedError exception if this way is not closed.
         #
         # Only works if the GeoRuby library is loaded.
@@ -396,7 +402,7 @@ module OSM
         # call-seq: polygon ->  GeoRuby::SimpleFeatures::Polygon or nil
         #
         def polygon
-            return nil if nodes.size < 3
+            raise OSM::GeometryError.new("way with less then three nodes can't be turned into a polygon") if nodes.size < 3
             raise OSM::NoDatabaseError.new("can't create Polygon from way if the way is not in a OSM::Database") if @db.nil?
             raise OSM::NotClosedError.new("way is not closed so it can't be represented as Polygon") unless is_closed?
             GeoRuby::SimpleFeatures::Polygon.from_coordinates([node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] }])
