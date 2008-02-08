@@ -13,43 +13,36 @@ module OSM
     class VersionError < Exception
     end
 
-    # Stream parser for OpenStreetMap .osm files.
-    class StreamParser
+    class Callbacks
 
-        def initialize(filename, db=nil)
-            @context = nil
-            @db = db
+        include XML::SaxParser::Callbacks
 
-            @sax_parser = XML::SaxParser.new
-            @sax_parser.filename = filename
-
-            @sax_parser.on_start_document { start_document if respond_to?(:start_document) }
-            @sax_parser.on_end_document { end_document if respond_to?(:end_document) }
-
-            @sax_parser.on_start_element { |name, attr_hash|
-                case name
-                    when 'osm'      then _start_osm(attr_hash)
-                    when 'node'     then _start_node(attr_hash)
-                    when 'way'      then _start_way(attr_hash)
-                    when 'relation' then _start_relation(attr_hash)
-                    when 'tag'      then _tag(attr_hash)
-                    when 'nd'       then _nd(attr_hash)
-                    when 'member'   then _member(attr_hash)
-                end
-            }
-
-            @sax_parser.on_end_element { |name|
-                case name
-                    when 'node'     then _end_node()
-                    when 'way'      then _end_way()
-                    when 'relation' then _end_relation()
-                end
-            }
+        def on_start_document
+            start_document if respond_to?(:start_document)
         end
 
-        # Run the parser
-        def parse
-            @sax_parser.parse
+        def on_end_document
+            end_document if respond_to?(:end_document)
+        end
+
+        def on_start_element(name, attr_hash)
+            case name
+                when 'osm'      then _start_osm(attr_hash)
+                when 'node'     then _start_node(attr_hash)
+                when 'way'      then _start_way(attr_hash)
+                when 'relation' then _start_relation(attr_hash)
+                when 'tag'      then _tag(attr_hash)
+                when 'nd'       then _nd(attr_hash)
+                when 'member'   then _member(attr_hash)
+            end
+        end
+
+        def on_end_element(name)
+            case name
+                when 'node'     then _end_node()
+                when 'way'      then _end_way()
+                when 'relation' then _end_relation()
+            end
         end
 
         private
@@ -107,6 +100,25 @@ module OSM
                 return unless member(@context, new_member)
             end
             @context.members << new_member
+        end
+
+    end
+
+    # Stream parser for OpenStreetMap .osm files.
+    class StreamParser
+
+        def initialize(filename, db=nil)
+            @context = nil
+            @db = db
+
+            @sax_parser = XML::SaxParser.new
+            @sax_parser.filename = filename
+            @sax_parser.callbacks = Callbacks.new
+        end
+
+        # Run the parser
+        def parse
+            @sax_parser.parse
         end
 
     end
