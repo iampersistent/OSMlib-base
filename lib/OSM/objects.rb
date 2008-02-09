@@ -147,7 +147,12 @@ module OSM
             attributes.each do |key, value|
                 fields[key.to_s] = value
             end
-            GeoRuby::Shp4r::ShpRecord.new(geometry, fields)
+            if attributes[:geometry]
+                g = self.send(attributes[:geometry])
+            else
+                g = geometry
+            end
+            GeoRuby::Shp4r::ShpRecord.new(g, fields)
         end
 
         def get_relations_from_api(api=OSM::API.new)

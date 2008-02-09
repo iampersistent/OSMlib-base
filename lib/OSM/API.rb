@@ -67,7 +67,7 @@ module OSM
             raise TypeError.new('id needs to be a positive integer') unless(id.kind_of?(Fixnum) && id > 0)
             response = get("#{type}/#{id}")
             check_response_codes(response)
-            parser = OSM::StreamParser.new(:string => response.body, :callbacks => OSM::ObjectListCallbacks)
+            parser = OSM::StreamParser.new(:string => response.body, :callbacks => OSM::ObjectListCallbacks.new)
             list = parser.parse
             raise APITooManyObjects if list.size > 1
             list[0]
@@ -133,7 +133,7 @@ module OSM
             raise TypeError.new('id needs to be a positive integer') unless(id.kind_of?(Fixnum) && id > 0)
             response = get(path)
             check_response_codes(response)
-            parser = OSM::StreamParser.new(:string => response.body, :callbacks => OSM::ObjectListCallbacks)
+            parser = OSM::StreamParser.new(:string => response.body, :callbacks => OSM::ObjectListCallbacks.new)
             parser.parse
         end
 

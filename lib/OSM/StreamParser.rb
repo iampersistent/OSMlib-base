@@ -178,7 +178,7 @@ module OSM
                 raise ArgumentError.new('need either :filename or :string argument')
             end
 
-            @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks].new
+            @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks]
             @callbacks.db = @db
 
             @sax_parser = XML::SaxParser.new
