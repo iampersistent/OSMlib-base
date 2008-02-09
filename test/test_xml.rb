@@ -6,7 +6,7 @@ require 'rubygems'
 require 'builder'
 
 # In this file we test the to_xml methods of all the different objects.
-class XmlTest < Test::Unit::TestCase
+class TestXml < Test::Unit::TestCase
 
     def setup
         @out = ''

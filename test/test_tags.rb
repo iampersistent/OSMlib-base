@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
 require 'test/unit'
 
-class TagsTest < Test::Unit::TestCase
+class TestTags < Test::Unit::TestCase
 
     def setup
         @tags = OSM::Tags.new

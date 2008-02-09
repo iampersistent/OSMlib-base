@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
 require 'test/unit'
 
-class RelationTest < Test::Unit::TestCase
+class TestRelation < Test::Unit::TestCase
 
     def test_create
         relation = OSM::Relation.new(123, 'somebody', '2007-02-20T10:29:49+00:00')
@@ -126,10 +126,13 @@ class RelationTest < Test::Unit::TestCase
 
     def test_magic_add_node
         relation = OSM::Relation.new
-        relation << OSM::Member.new('node', 21, 'foo')
+        relation << node = OSM::Member.new('node', 21, 'foo')
         assert ! relation.is_tagged?
         assert_equal 1, relation.members.size
+        assert_equal node, relation.members[0]
         assert_equal 'node', relation.members[0].type
+        assert_equal node, relation.member('node', 21)
+        assert_nil relation.member('node', 22)
     end
 
 end

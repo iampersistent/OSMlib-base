@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
 require 'test/unit'
 
-class NodeTest < Test::Unit::TestCase
+class TestNode < Test::Unit::TestCase
 
     def test_create
         node = OSM::Node.new(17, 'somebody', '2007-02-20T10:29:49+00:00', 8.5, 47.5)

@@ -4,7 +4,7 @@ require 'test/unit'
 require 'rubygems'
 require 'geo_ruby'
 
-class GeometryTest < Test::Unit::TestCase
+class TestGeometry < Test::Unit::TestCase
 
     def setup
         @db = OSM::Database.new

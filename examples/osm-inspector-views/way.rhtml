@@ -1,0 +1,13 @@
+<table class="desc">
+    <tr><th class="first">Timestamp:</th><td><%=h @obj.timestamp %></td></tr>
+    <tr><th class="first">User:</th><td><%= @user %></td></tr>
+    <tr><th class="first">Nodes:</th><td>
+        <%= @obj.nodes.collect{ |node| %Q{<a href="/node/#{node}">#{node}</a>} }.join(', ') %>
+        <%= @obj.is_closed? ? '<i>(closed)</i>' : '<i>(not&nbsp;closed)</i>' %>
+    </td></tr>
+    <% unless @tags.nil? %>
+        <tr><th class="first">Tags:</th><td>
+            <%= @tags %>
+        </td></tr>
+    <% end %>
+</table>

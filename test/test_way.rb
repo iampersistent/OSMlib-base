@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
 require 'test/unit'
 
-class WayTest < Test::Unit::TestCase
+class TestWay < Test::Unit::TestCase
 
     def test_create
         way = OSM::Way.new(123, 'somebody', '2007-02-20T10:29:49+00:00')

@@ -17,6 +17,8 @@ module OSM
 
         include XML::SaxParser::Callbacks
 
+        attr_accessor :db
+
         def on_start_document
             start_document if respond_to?(:start_document)
         end
@@ -45,6 +47,32 @@ module OSM
             end
         end
 
+        # Overwrite this in a derived class. The default behaviour is to do nothing
+        # but to store all node objects in a OSM::Database if one was supplied when
+        # creating the OSM::StreamParser object.
+        def node(node)
+            true
+        end
+
+        # Overwrite this in a derived class. The default behaviour is to do nothing
+        # but to store all way objects in a OSM::Database if one was supplied when
+        # creating the OSM::StreamParser object.
+        def way(way)
+            true
+        end
+
+        # Overwrite this in a derived class. The default behaviour is to do nothing
+        # but to store all relation objects in a OSM::Database if one was supplied when
+        # creating the OSM::StreamParser object.
+        def relation(relation)
+            true
+        end
+
+        # Overwrite this in a derived class. Whatever this method returns will be
+        # returned from the OSM::StreamParser#parse method.
+        def result
+        end
+
         private
 
         def _start_osm(attr_hash)
@@ -58,9 +86,7 @@ module OSM
         end
 
         def _end_node()
-            if respond_to?(:node)
-                @db << @context if node(@context) && ! @db.nil?
-            end
+            @db << @context if node(@context) && ! @db.nil?
         end
 
         def _start_way(attr_hash)
@@ -68,9 +94,7 @@ module OSM
         end
 
         def _end_way()
-            if respond_to?(:way)
-                @db << @context if way(@context) && ! @db.nil?
-            end
+            @db << @context if way(@context) && ! @db.nil?
         end
 
         def _start_relation(attr_hash)
@@ -78,9 +102,7 @@ module OSM
         end
 
         def _end_relation()
-            if respond_to?(:relation)
-                @db << @context if relation(@context) && ! @db.nil?
-            end
+            @db << @context if relation(@context) && ! @db.nil?
         end
 
         def _nd(attr_hash)
@@ -104,21 +126,74 @@ module OSM
 
     end
 
-    # Stream parser for OpenStreetMap .osm files.
-    class StreamParser
+    # This callback class for OSM::StreamParser collects all objects found in the XML in
+    # an array and the OSM::StreamParser#parse method returns this array.
+    class ObjectListCallbacks < Callbacks
 
-        def initialize(filename, db=nil)
-            @context = nil
-            @db = db
-
-            @sax_parser = XML::SaxParser.new
-            @sax_parser.filename = filename
-            @sax_parser.callbacks = Callbacks.new
+        def start_document
+            @list = []
         end
 
-        # Run the parser
+        def node(node)
+            @list << node
+        end
+
+        def way(way)
+            @list << way
+        end
+
+        def relation(relation)
+            @list << relation
+        end
+
+        def result
+            @list
+        end
+
+    end
+
+    # Stream parser for OpenStreetMap .osm files. Generally you want to create a subclass
+    # of this class like this:
+    #
+    # XXX
+    class StreamParser
+
+        # Create new StreamParser object. Only argument is a hash:
+        #
+        # call-seq: OSM::StreamParser.new(:filename => 'filename')
+        #           OSM::StreamParser.new(:string => '<?xml....')
+        #
+        # The optional argument
+        #   :db => [some database object]
+        #   :callbacks => 
+        # XXX
+        #
+        def initialize(options)
+            @filename = options[:filename]
+            @string = options[:string]
+            @db = options[:db]
+            @context = nil
+
+            if (@filename.nil? && @string.nil?) || ((!@filename.nil?) && (!@string.nil?))
+                raise ArgumentError.new('need either :filename or :string argument')
+            end
+
+            @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks].new
+            @callbacks.db = @db
+
+            @sax_parser = XML::SaxParser.new
+            if @filename.nil?
+                @sax_parser.string = @string
+            else
+                @sax_parser.filename = @filename
+            end
+            @sax_parser.callbacks = @callbacks
+        end
+
+        # Run the parser. Returns the contents of the @result instance variable.
         def parse
             @sax_parser.parse
+            @callbacks.result
         end
 
     end

@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'Database.rb')
 require 'test/unit'
 
-class DatabaseTest < Test::Unit::TestCase
+class TestDatabase < Test::Unit::TestCase
 
     def setup
         @db = OSM::Database.new

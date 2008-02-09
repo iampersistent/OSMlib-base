@@ -5,7 +5,7 @@ require 'rexml/document'
 require 'rubygems'
 require 'builder'
 
-class TestParser < OSM::StreamParser
+class CallbacksForTests < OSM::Callbacks
 
     include Test::Unit::Assertions
 
@@ -21,15 +21,33 @@ class TestParser < OSM::StreamParser
 
 end
 
-class ParserTest < Test::Unit::TestCase
+class TestParser < Test::Unit::TestCase
 
-    def setup
-        @parser = TestParser.new('test/test.osm')
+    def test_create_fail
+        assert_raise ArgumentError do
+            OSM::StreamParser.new
+        end
+        assert_raise ArgumentError do
+            OSM::StreamParser.new(:filename => 'foo', :string => 'bar')
+        end
     end
 
-    def test_create
-        assert_kind_of OSM::StreamParser, @parser
-        @parser.parse
+    def test_create_with_file
+        parser = OSM::StreamParser.new(:filename => 'test/test.osm', :callbacks => CallbacksForTests)
+        assert_kind_of OSM::StreamParser, parser
+        parser.parse
+    end
+
+    def test_create_with_string
+        parser = OSM::StreamParser.new(:callbacks => CallbacksForTests, :string => %q{<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.5" generator="OpenStreetMap server">
+  <node id="17905203" lat="48.9614113" lon="8.3046066" user="test" visible="true" timestamp="2007-04-09T22:16:39+01:00">
+    <tag k="created_by" v="JOSM"/>
+  </node>
+</osm>
+        })
+        assert_kind_of OSM::StreamParser, parser
+        parser.parse
     end
 
 end

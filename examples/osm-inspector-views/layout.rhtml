@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title><%= @title %>OSM Inspector</title>
+        <link rel="stylesheet" type="text/css" href="/static/common.css" />
+    </head>
+    <body>
+
+        <table class="top">
+            <tr>
+                <td><h1>OSM Inspector</h1></td>
+                <td>
+                    <form method="get" action="/lookup">
+                        <label for="lookup">Lookup</label>:
+                        <input type="text" id="lookup" name="query" accesskey="s"/>
+                    </form>
+                </td>
+                <td>(Enter ID of node, way, or relation like this: "n1234", "w3456", "r6789")</td>
+            </tr>
+        </table>
+
+        <%= @content %>
+
+    </body>
+</html>

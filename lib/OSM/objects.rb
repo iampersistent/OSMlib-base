@@ -1,13 +1,16 @@
-# Contains classes for OpenStreetMap objects: OSM::OSMObject (virtual parent class), OSM::Node, OSM::Way, OSM::Relation, OSM::Member
+# Contains classes for OpenStreetMap objects: OSM::OSMObject
+# (virtual parent class), # OSM::Node, OSM::Way, OSM::Relation, OSM::Member
 
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
-    # This error is raised when an object is not associated with a OSM::Database but database access is needed.
+    # This error is raised when an object is not associated with a
+    # OSM::Database but database access is needed.
     class NoDatabaseError < StandardError
     end
 
-    # This error is raised when a way that should be closed (i.e. first node equals last node) isn't
+    # This error is raised when a way that should be closed (i.e.
+    # first node equals last node) but isn't.
     class NotClosedError < StandardError
     end
 
@@ -15,24 +18,27 @@ module OSM
     class NoGeometryError < StandardError
     end
 
-    # This error is raised when an OSM object can't be turned into a proper geometry. Happens if way has not enough nodes.
+    # This error is raised when an OSM object can't be turned into
+    # a proper geometry. Happens if way has not enough nodes.
     class GeometryError < StandardError
     end
 
     # This is a virtual parent class for the OSM objects Node, Way and Relation.
     class OSMObject
 
-        # To give out unique IDs to the objects we keep a counter that gets decreased every time we use it. See
-        # the #_next_id method.
+        # To give out unique IDs to the objects we keep a counter that
+        # gets decreased every time we use it. See the _next_id method.
         @@id = 0
 
         # Unique ID
         attr_reader :id
 
-        # The user who last edited this object (as read from file, it is not updated by operations to this object)
+        # The user who last edited this object (as read from file, it
+        # is not updated by operations to this object)
         attr_accessor :user
 
-        # Last change of this object (as read from file, it is not updated by operations to this object)
+        # Last change of this object (as read from file, it is not
+        # updated by operations to this object)
         attr_reader :timestamp
 
         # Tags for this object
@@ -40,6 +46,11 @@ module OSM
 
         # The OSM::Database this object is in (if any)
         attr_accessor :db
+
+        # Get OSM::OSMObject from API
+        def self.from_api(id, api=OSM::API.new)
+            api.get_object(type, id)
+        end
 
         def initialize(id, user, timestamp) #:nodoc:
             raise NotImplementedError.new('OSMObject is a virtual base class for the Node, Way, and Relation classes') if self.class == OSM::OSMObject
@@ -51,7 +62,8 @@ module OSM
             @tags = Tags.new
         end
 
-        # Create an error when somebody tries to set the ID. (We need this here because otherwise method_missing will be called.)
+        # Create an error when somebody tries to set the ID.
+        # (We need this here because otherwise method_missing will be called.)
         def id=(id) # :nodoc:
             raise NotImplementedError.new('id can not be changed once the object was created')
         end
@@ -68,7 +80,9 @@ module OSM
 
         # Returns a hash of all non-nil attributes of this object.
         #
-        # Keys of this hash are <tt>:id</tt>, <tt>:user</tt>, and <tt>:timestamp</tt>. For a Node also <tt>:lon</tt> and <tt>:lat</tt>.
+        # Keys of this hash are <tt>:id</tt>, <tt>:user</tt>,
+        # and <tt>:timestamp</tt>. For a Node also <tt>:lon</tt>
+        # and <tt>:lat</tt>.
         #
         # call-seq: attributes -> Hash
         #
@@ -110,9 +124,10 @@ module OSM
             ! @tags.empty?
         end
 
-        # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of this object and
-        # the given attributes. Will raise a NoGeometryError if the object is not associated
-        # with a geometry. Will raise a GeometryError if there is insufficient data to
+        # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of
+        # this object and the given attributes. Will raise a
+        # NoGeometryError if the object is not associated with a geometry.
+        # Will raise a GeometryError if there is insufficient data to
         # create a geometry such as not enough nodes in a way.
         #
         # This only works if the GeoRuby library is included.
@@ -135,8 +150,17 @@ module OSM
             GeoRuby::Shp4r::ShpRecord.new(geometry, fields)
         end
 
-        # All other methods are mapped so its easy to access tags: For instance obj.name
-        # is the same as obj.tags['name']. This works for getting and setting tags.
+        def get_relations_from_api(api=OSM::API.new)
+            api.get_relations_referring_to_object(type, self.id.to_i)
+        end
+
+        def get_history_from_api(api=OSM::API.new)
+            api.get_history(type, self.id.to_i)
+        end
+
+        # All other methods are mapped so its easy to access tags: For
+        # instance obj.name is the same as obj.tags['name']. This works
+        # for getting and setting tags.
         #
         #   node = OSM::Node.new
         #   node.add_tags( 'highway' => 'residential', 'name' => 'Main Street' )
@@ -144,13 +168,14 @@ module OSM
         #   node.highway = 'unclassified'  #=> 'unclassified'
         #   node.name                      #=> 'Main Street'
         #
-        # In addition methods of the form <tt>key?</tt> are used to check boolean tags.
-        # For instance +oneway+ can be 'true' or 'yes' or '1', all meaning the same.
+        # In addition methods of the form <tt>key?</tt> are used to
+        # check boolean tags. For instance +oneway+ can be 'true' or
+        # 'yes' or '1', all meaning the same.
         #
         #   way.oneway?
         #
-        # will check this. It returns true if the value of this key is either 'true',
-        # 'yes' or '1'.
+        # will check this. It returns true if the value of this key is
+        # either 'true', 'yes' or '1'.
         def method_missing(method, *args)
             methodname = method.to_s
             if methodname.slice(-1, 1) == '='
@@ -237,6 +262,10 @@ module OSM
             super(id, user, timestamp)
         end
 
+        def type
+            'node'
+        end
+
         # Set longitude.
         def lon=(lon)
             @lon = _check_lon(lon)
@@ -275,7 +304,8 @@ module OSM
             self    # return self to allow chaining
         end
 
-        # Create object of class GeoRuby::SimpleFeatures::Point with the coordinates of this node.
+        # Create object of class GeoRuby::SimpleFeatures::Point with
+        # the coordinates of this node.
         # Raises an OSM::GeometryError exception if the coordinates are not set.
         #
         # Only works if the GeoRuby library is loaded.
@@ -299,11 +329,17 @@ module OSM
             "#<OSM::Node id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\" lon=\"#{@lon}\" lat=\"#{@lat}\">"
         end
 
-        # Return XML for this node. This method uses the XML Builder library. The only parameter is the builder object.
+        # Return XML for this node. This method uses the XML Builder
+        # library. The only parameter is the builder object.
         def to_xml(xml)
             xml.node(attributes) do |xml|
                 tags.to_xml(xml)
             end
+        end
+
+        # Get Way object from API
+        def get_ways_using_node_from_api(api=OSM::API.new)
+            api.get_ways_using_node(self.id.to_i)
         end
 
     end
@@ -323,6 +359,10 @@ module OSM
         def initialize(id=nil, user=nil, timestamp=nil, nodes=[])
             @nodes = nodes.collect{ |node| node.kind_of?(OSM::Node) ? node.id : node }
             super(id, user, timestamp)
+        end
+
+        def type
+            'way'
         end
 
         # Add one or more tags or nodes to this way.
@@ -380,8 +420,10 @@ module OSM
             end
         end
 
-        # Create object of class GeoRuby::SimpleFeatures::LineString with the coordinates of the node in this way.
-        # Raises a OSM::GeometryError exception if the way contain less than two nodes. Raises an OSM::NoDatabaseError exception if this way
+        # Create object of class GeoRuby::SimpleFeatures::LineString with the
+        # coordinates of the node in this way.
+        # Raises a OSM::GeometryError exception if the way contain less than
+        # two nodes. Raises an OSM::NoDatabaseError exception if this way
         # is not associated with an OSM::Database.
         #
         # Only works if the GeoRuby library is loaded.
@@ -394,9 +436,13 @@ module OSM
             GeoRuby::SimpleFeatures::LineString.from_coordinates(node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] })
         end
 
-        # Create object of class GeoRuby::SimpleFeatures::Polygon with the coordinates of the node in this way.
-        # Raises a OSM::GeometryError exception if the way contain less than three nodes. Raises an OSM::NoDatabaseError exception if this way
-        # is not associated with an OSM::Database. Raises an OSM::NotClosedError exception if this way is not closed.
+        # Create object of class GeoRuby::SimpleFeatures::Polygon with
+        # the coordinates of the node in this way.
+        # Raises a OSM::GeometryError exception if the way contain less
+        # than three nodes.
+        # Raises an OSM::NoDatabaseError exception if this way is not
+        # associated with an OSM::Database.
+        # Raises an OSM::NotClosedError exception if this way is not closed.
         #
         # Only works if the GeoRuby library is loaded.
         #
@@ -409,7 +455,8 @@ module OSM
             GeoRuby::SimpleFeatures::Polygon.from_coordinates([node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] }])
         end
 
-        # Currently the same as the linestring method. This might change in the future to return a Polygon in some cases.
+        # Currently the same as the linestring method. This might change in
+        # the future to return a Polygon in some cases.
         #
         # Only works if the GeoRuby library is loaded.
         #
@@ -427,7 +474,8 @@ module OSM
             "#<OSM::Way id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\">"
         end
 
-        # Return XML for this way. This method uses the Builder library. The only parameter ist the builder object.
+        # Return XML for this way. This method uses the Builder library.
+        # The only parameter ist the builder object.
         def to_xml(xml)
             xml.way(attributes) do |xml|
                 nodes.each do |node|
@@ -451,6 +499,10 @@ module OSM
         def initialize(id=nil, user=nil, timestamp=nil, members=[])
             @members = members
             super(id, user, timestamp)
+        end
+
+        def type
+            'relation'
         end
 
         # Add one or more tags or members to this relation.
@@ -482,8 +534,9 @@ module OSM
 
         # Raises a NoGeometryError.
         #
-        # Future versions of this library may recognize certain relations that do have a geometry
-        # (such as Multipolygon relations) and do the right thing.
+        # Future versions of this library may recognize certain relations
+        # that do have a geometry (such as Multipolygon relations) and do
+        # the right thing.
         def geometry
             raise NoGeometryError.new("Relations don't have a geometry")
         end
@@ -496,7 +549,17 @@ module OSM
             "#<OSM::Relation id=\"#{@id}\" user=\"#{@user}\" timestamp=\"#{@timestamp}\">"
         end
 
-        # Return XML for this relation. This method uses the Builder library. The only parameter ist the builder object.
+        # Return the member with a specified type and id. Returns nil
+        # if not found.
+        #
+        # call-seq: member(type, id) -> OSM::Member
+        #
+        def member(type, id)
+            members.select{ |member| member.type == type && member.ref == id }[0]
+        end
+
+        # Return XML for this relation. This method uses the Builder library.
+        # The only parameter ist the builder object.
         def to_xml(xml)
             xml.relation(attributes) do |xml|
                 members.each do |member|
@@ -520,8 +583,9 @@ module OSM
         # ID of referenced object
         attr_reader :ref
 
-        # Create a new Member object. Type can be one of 'node', 'way' or 'relation'. Ref is the
-        # ID of the corresponding Node, Way, or Relation. Role is a freeform string and can be empty.
+        # Create a new Member object. Type can be one of 'node', 'way' or
+        # 'relation'. Ref is the ID of the corresponding Node, Way, or
+        # Relation. Role is a freeform string and can be empty.
         def initialize(type, ref, role='')
             if type !~ /^(node|way|relation)$/
                 raise ArgumentError.new("type must be 'node', 'way', or 'relation'")
@@ -534,21 +598,33 @@ module OSM
             @role = role
         end
 
-        # Return XML for this way. This method uses the Builder library. The only parameter ist the builder object.
+        # Return XML for this way. This method uses the Builder library.
+        # The only parameter ist the builder object.
         def to_xml(xml)
             xml.member(:type => type, :ref => ref, :role => role)
         end
 
     end
 
-    # A collection of OSM tags which can be attached to a Node, Way, or Relation. It is a subclass of Hash.
+    # A collection of OSM tags which can be attached to a Node, Way,
+    # or Relation.
+    # It is a subclass of Hash.
     class Tags < Hash
 
-        # Return XML for these tags. This method uses the Builder library. The only parameter ist the builder object.
+        # Return XML for these tags. This method uses the Builder library.
+        # The only parameter ist the builder object.
         def to_xml(xml)
             each do |key, value|
                 xml.tag(:k => key, :v => value)
             end
+        end
+
+        # Return string with comma separated key=value pairs.
+        #
+        # call-seq: to_s -> String
+        #
+        def to_s
+            sort.collect{ |k, v| "#{k}=#{v}" }.join(', ')
         end
 
     end

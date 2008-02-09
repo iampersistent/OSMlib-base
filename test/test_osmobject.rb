@@ -2,7 +2,7 @@ $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
 require 'test/unit'
 
-class OSMObjectTest < Test::Unit::TestCase
+class TestOSMObject < Test::Unit::TestCase
 
     def test_init
         assert_raise ArgumentError do

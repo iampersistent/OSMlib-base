@@ -1,0 +1,24 @@
+<table class="desc">
+    <tr><th class="first">Timestamp:</th><td><%=h @obj.timestamp %></td></tr>
+    <tr><th class="first">User:</th><td><%= @user %></td></tr>
+    <tr><th class="first">Longitude:</th><td><%=h @obj.lon %></td></tr>
+    <tr><th class="first">Latitude:</th><td><%=h @obj.lat %></td></tr>
+    <% unless @tags.nil? %>
+        <tr><th class="first">Tags:</th><td>
+            <%= @tags %>
+        </td></tr>
+    <% end %>
+</table>
+
+<% if ! @ways.nil? && @ways.size > 0 %>
+<h2>Ways</h2>
+
+<table class="desc">
+    <% @ways.sort{ |a,b| a.id <=> b.id }.each do |way| %>
+    <tr>
+        <td class="first"><a href="/way/<%=u way.id %>">way <%=h way.id %></a></td>
+        <td><%= way.tags %></td>
+    </tr>
+    <% end %>
+</table>
+<% end %>
