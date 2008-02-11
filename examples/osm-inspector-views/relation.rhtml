@@ -1,15 +1,10 @@
 <table class="desc">
     <tr><th class="first">Timestamp:</th><td><%=h @obj.timestamp %></td></tr>
     <tr><th class="first">User:</th><td><%= @user %></td></tr>
-    <% unless @tags.nil? %>
-        <tr><th class="first">Tags:</th><td>
-            <%= @tags %>
-        </td></tr>
-    <% end %>
 </table>
 
-<h2>Members</h2>
-<table class="desc members">
+<h3>Members:</h3>
+<table class="desc">
     <% @obj.members.each do |member| %>
         <tr>
             <td class="first"><a href="/<%=u member.type %>/<%=u member.ref %>"><%=h "#{member.type} #{member.ref}" %></a></td>

@@ -1,0 +1,12 @@
+<% if @tags && @tags.size > 0 %>
+    <h3>Tags:</h3>
+
+    <table class="desc">
+        <% @tags.keys.sort.each do |k| %>
+            <tr>
+                <td class="first"><a class="extlink" href="http://wiki.openstreetmap.org/index.php/Key:<%=h k %>"><%=h k %></a></td>
+                <td><%=h @tags[k] %></td>
+            </tr>
+        <% end %>
+    </table>
+<% end %>

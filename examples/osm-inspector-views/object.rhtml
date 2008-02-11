@@ -6,23 +6,10 @@
 
 <div class="main">
     <h1><%= @type.capitalize %> <span class="objid"><%= @id %></span></h1>
-    <%= @content %>
-
-    <% if @object && @object.tags.size > 0 %>
-        <h2>Tags</h2>
-
-        <table class="desc tags">
-            <% @object.tags.keys.sort.each do |k| %>
-                <tr>
-                    <td class="first"><a class="extlink" href="http://wiki.openstreetmap.org/index.php/Key:<%=h k %>"><%=h k %></a></td>
-                    <td><%=h @object.tags[k] %></td>
-                </tr>
-            <% end %>
-        </table>
-    <% end %>
+    <%= @objhtml %>
 
     <% if @relations.size > 0 %>
-        <h2>Relations</h2>
+        <h3>Relations:</h3>
 
         <table class="desc relations">
             <% @relations.sort.each do |rel|
@@ -37,7 +24,7 @@
     <% end %>
 
     <% if @history.size > 0 %>
-        <h2>History</h2>
+        <h2>Old versions:</h2>
         <%= @historyhtml %>
     <% end %>
 

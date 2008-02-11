@@ -1,7 +1,96 @@
 <html>
     <head>
         <title><%= @title %>OSM Inspector</title>
-        <link rel="stylesheet" type="text/css" href="/static/common.css" />
+        <style type="text/css">
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #e0e0e0;
+}
+
+a {
+    color: #000000;
+}
+
+a.extlink {
+    color: #4040f0;
+}
+
+table.top {
+    background-color: #e0eee0;
+    width: 100%;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+table.top td {
+    padding: 4px;
+    vertical-align: middle;
+}
+
+table.top h1, table.top form {
+    margin: 0;
+}
+
+div.xml {
+    position: absolute;
+    right: 0px;
+    margin: 10px;
+    padding: 6px;
+    border: 1px solid #c0c0c0;
+    background-color: #d0d0d0;
+}
+
+div.main {
+    padding: 10px;
+}
+
+div.old {
+    border: 1px dotted #a0a0a0;
+}
+
+h1 span.objid {
+    background-color: #f0f0f0;
+    padding: 0px 2px 0px 2px;
+}
+
+h1.warn {
+    color: #e02020;
+}
+
+h3 {
+    margin-left: 4px;
+    margin-bottom: 0;
+}
+
+table.desc {
+    border-spacing: 4px;
+    width: 100%;
+}
+
+table.desc th {
+    text-align: right;
+    vertical-align: top;
+    padding: 3px;
+}
+
+table.desc .first {
+    text-align: right;
+    width: 12em;
+}
+
+table.desc td {
+    background-color: #f0f0f0;
+    padding: 3px;
+    vertical-align: top;
+}
+
+table.relations th {
+    width: 5em;
+}
+
+        </style>
     </head>
     <body>
 

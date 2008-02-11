@@ -58,6 +58,7 @@ class InspectorServlet < WEBrick::HTTPServlet::AbstractServlet
         :object => ERB.new((DIR + 'object.rhtml').read),
         :node   => ERB.new((DIR + 'node.rhtml').read),
         :way    => ERB.new((DIR + 'way.rhtml').read),
+        :tags   => ERB.new((DIR + 'tags.rhtml').read),
         :relation => ERB.new((DIR + 'relation.rhtml').read)
     }
 
@@ -72,7 +73,6 @@ class InspectorServlet < WEBrick::HTTPServlet::AbstractServlet
     end
 
 end
-
 
 class RootServlet < InspectorServlet
 
@@ -97,7 +97,11 @@ class ObjServlet < InspectorServlet
         @uribase = OSM::API::DEFAULT_BASE_URI
     end
 
-    def userhtml(user)
+    def xmllink(suffix, text)
+        %Q{<a href="#{@uribase}#{@type}/#{@id}#{suffix}">#{text}</a>}
+    end
+
+    def html_for_user(user)
         if user
             %Q{<a class="extlink" href="http://www.openstreetmap.org/user/#{u(user)}">#{h(user)}</a>}
         else
@@ -105,8 +109,11 @@ class ObjServlet < InspectorServlet
         end
     end
 
-    def xmllink(suffix, text)
-        %Q{<a href="#{@uribase}#{@type}/#{@id}#{suffix}">#{text}</a>}
+    def html_for_object(obj)
+        @obj = obj
+        @user = html_for_user(obj.user)
+        @tags = obj.tags
+        template(@type.to_sym) + template(:tags)
     end
 
     def do_GET(request, response)
@@ -128,7 +135,7 @@ class ObjServlet < InspectorServlet
             @relations = @object.get_relations_from_api(@api)
             @history = @object.get_history_from_api(@api)
             @history.pop    # remove last element, because thats the current one
-            @user = userhtml(@object.user)
+            @user = html_for_user(@object.user)
             @xml = [
                 xmllink('', @type),
                 xmllink('/history', 'history'),
@@ -138,24 +145,18 @@ class ObjServlet < InspectorServlet
                 @ways = @object.get_ways_using_node_from_api(@api)
                 @xml << xmllink('/ways', 'ways')
             end
-            @obj = @object
-            @content = template(@type.to_sym)
+            @objhtml = html_for_object(@object)
         rescue OSM::APIGone
-            @content = %Q{<h1 class="warn">Deleted!</h1>}
+            @objhtml = %Q{<h1 class="warn">Deleted!</h1>}
             @history = @api.get_history(@type, @id)
             @object = @history[-1]
             @xml = [ xmllink('/history', 'history') ]
         rescue OSM::APINotFound
-            @content = %Q{<h1 class="warn">Does not exist and never has</h1>}
+            @objhtml = %Q{<h1 class="warn">Does not exist and never has</h1>}
         end
 
         if @history.size > 0
-            @historyhtml = @history.collect{ |obj|
-                @obj = obj
-                @user = userhtml(obj.user)
-                @tags = obj.tags
-                template(@type.to_sym)
-            }.join("<br/>\n")
+            @historyhtml = @history.collect{ |obj| '<div class="old">' + html_for_object(obj) + '</div>' }.join()
             @user = nil
             @tags = nil
         end
@@ -173,7 +174,6 @@ server.mount('/lookup',    LookupServlet)
 server.mount('/node/',     ObjServlet, 'node')
 server.mount('/way/',      ObjServlet, 'way')
 server.mount('/relation/', ObjServlet, 'relation')
-server.mount('/static',    WEBrick::HTTPServlet::FileHandler, DIR + 'static')
 
 ['TERM', 'INT'].each do |signal|
     trap(signal) { server.shutdown }
