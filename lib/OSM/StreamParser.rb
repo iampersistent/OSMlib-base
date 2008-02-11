@@ -1,7 +1,11 @@
 # Contains the OSM::StreamParser class.
 
 require 'rubygems'
-require 'xml/libxml'
+begin
+    require 'xml/libxml'
+rescue LoadError
+    require 'libxml'
+end
 
 require 'OSM/objects'
 require 'OSM/Database'
