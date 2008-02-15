@@ -3,24 +3,24 @@
 #
 #  OSM Inspector
 #
-#  Copyright 2008 Jochen Topf <jochen@topf.org>
+#  Created by Jochen Topf <jochen@topf.org>
 #
 #  http://osmlib.rubyforge.org/
 #
 #-----------------------------------------------------------------------------
 #
-#  OSM Inspector is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
+#  The OSM Inspector is used to inspect the contents of the OSM database
+#  through a web interface. If you start the OSM Inspector it opens a
+#  web server on Port 8008. You can look up nodes, ways, and relations by
+#  ID. OSM Inspector will show you the OSM objects with all attributes,
+#  coordinates, tags, etc.
 #
-#  Foobar is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
+#-----------------------------------------------------------------------------
 #
-#  You should have received a copy of the GNU General Public License
-#  along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+#  This work is released into the public domain. This applies worldwide.
+#  In case this is not legally possible, any entity is granted the right
+#  to use this work for any purpose, without any conditions, unless such
+#  conditions are required by law.
 #
 #-----------------------------------------------------------------------------
 

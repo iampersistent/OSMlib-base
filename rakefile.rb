@@ -23,7 +23,7 @@ Rake::RDocTask::new do |rdoc|
     rdoc.rdoc_dir = 'rdoc/'
     rdoc.title    = "OSM Library Documentation - Base"
     rdoc.options << '--line-numbers' << '--inline-source'
-    rdoc.rdoc_files = FileList['README', 'lib/**/*.rb']
+    rdoc.rdoc_files = FileList['README', 'examples/README', 'lib/**/*.rb']
 end
 
 spec = Gem::Specification::new do |s|

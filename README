@@ -18,8 +18,8 @@ Jochen Topf <jochen@topf.org>
 
 For more information see the OSM Library home page at
 http://osmlib.rubyforge.org/ or the Rubyforge project page at
-http://rubyforge.org/projects/osmlib/ . The OpenStreetMap web page
-is at http://www.openstreetmap.org/ .
+http://rubyforge.org/projects/osmlib/ . The OpenStreetMap project can
+be found at http://www.openstreetmap.org/ .
 
 == Dependencies
 
@@ -28,6 +28,9 @@ is at http://www.openstreetmap.org/ .
 Dependencies are not all installed automatically when installing the gem
 packages because this breaks when the packages are already installed as
 Debian packages.
+
+You need a reasonably new version of libxml-ruby. The one in Ubuntu 7.10 is
+too old.
 
 == Usage
 
@@ -47,7 +50,7 @@ of OSM::OSMObject.
   # create a relation
   relation = OSM::Relation.new(331, 'user', '2007-10-31T23:51:53Z')
 
-There is also a OSM::Member class for members of a relation:
+There is also an OSM::Member class for members of a relation:
 
   # create a member and add it to a relation
   member = OSM::Member.new('way', 1743, 'role')
@@ -69,12 +72,29 @@ As a convenience tags can also be accessed with their name only:
 This is implemented with the method_missing() function. Of course it
 only works for tag keys which are allowed as ruby method names.
 
+=== Accessing the OSM API
+
+You can access the OSM RESTful web API through the OSM::API class
+and through some methods in the OSM::Node, OSM::Way, and OSM::Relation
+classes.
+
+There are methods for getting Nodes, Ways, and Relations by ID,
+getting the history of an object etc.
+
+Currently only read access is implemented, write access will follow
+in a later version.
+
+See the OSM::API class for details.
+
 === The Stream Parser
 
-To parse an OSM XML file create a subclass of OSM::StreamParser,
-instantiate an object of this class and call its parse method:
+(NOTE: This API changed between version 0.1.1 and 0.1.2 of the
+osmlib-base library to better fit newer versions of libxml-ruby.)
 
-  class MyParser < OSM::StreamParser
+To parse an OSM XML file create a subclass of OSM::Callbacks and
+define the methods node(), way(), and relation() in it:
+
+  class MyCallbacks < OSM::Callbacks
 
     def node(node)
        ...
@@ -90,7 +110,10 @@ instantiate an object of this class and call its parse method:
 
   end
 
-  parser = MyParser.new('filename.osm')
+Instantiate an object of this class and give it to a OSM::StreamParser:
+
+  cb = MyCallbacks.new
+  parser = OSM::StreamParser.new(:filename => 'filename.osm', :callbacks => cb)
   parser.parse
 
 The methods node(), way(), or relation() will be called whenever
@@ -113,7 +136,7 @@ not too big.
 
 When creating the parser you can give it the database object:
 
-  parser = MyParser.new('filename.osm', db)
+  parser = OSM::StreamParser.new(:filename => 'filename.osm', :db => db)
 
 In your node(), way(), and relation() methods you now have to return
 +true+ if you want this object to be stored in the database and +false+
@@ -144,4 +167,8 @@ When deleting a database call
 
 first. This will break the internal loop references and makes sure
 that the garbage collector can free the memory.
+
+== More examples
+
+For more examples see the examples directory.
 

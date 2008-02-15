@@ -1,5 +1,5 @@
 # Contains classes for OpenStreetMap objects: OSM::OSMObject
-# (virtual parent class), # OSM::Node, OSM::Way, OSM::Relation, OSM::Member
+# (virtual parent class), OSM::Node, OSM::Way, OSM::Relation, and OSM::Member
 
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
@@ -48,7 +48,8 @@ module OSM
         attr_accessor :db
 
         # Get OSM::OSMObject from API
-        def self.from_api(id, api=OSM::API.new)
+        def self.from_api(id, api=OSM::API.new) #:nodoc:
+            raise NotImplementedError.new('OSMObject is a virtual base class for the Node, Way, and Relation classes') if self.class == OSM::OSMObject
             api.get_object(type, id)
         end
 
@@ -155,10 +156,24 @@ module OSM
             GeoRuby::Shp4r::ShpRecord.new(g, fields)
         end
 
+        # Get all relations from the API that have his object as members.
+        #
+        # The optional parameter is an OSM::API object. If none is specified
+        # the default OSM API is used.
+        #
+        # Returns an array of Relation objects or an empty array.
+        #
         def get_relations_from_api(api=OSM::API.new)
             api.get_relations_referring_to_object(type, self.id.to_i)
         end
 
+        # Get the history of this object from the API.
+        #
+        # The optional parameter is an OSM::API object. If none is specified
+        # the default OSM API is used.
+        #
+        # Returns an array of OSM::Node, OSM::Way, or OSM::Relation objects
+        # with all the versions.
         def get_history_from_api(api=OSM::API.new)
             api.get_history(type, self.id.to_i)
         end
@@ -250,6 +265,13 @@ module OSM
     end
 
     # OpenStreetMap Node.
+    #
+    # To create a new OSM::Node object:
+    #   node = OSM::Node.new(17, 'someuser', '2007-10-31T23:48:54Z', 7.4, 53.2)
+    #
+    # To get a node from the API:
+    #   node = OSM::Node.from_api(17)
+    #
     class Node < OSMObject
 
         # Longitude in decimal degrees
@@ -342,7 +364,12 @@ module OSM
             end
         end
 
-        # Get Way object from API
+        # Get all ways using this node from the API.
+        #
+        # The optional parameter is an OSM::API object. If none is specified
+        # the default OSM API is used.
+        #
+        # Returns an array of OSM::Way objects.
         def get_ways_using_node_from_api(api=OSM::API.new)
             api.get_ways_using_node(self.id.to_i)
         end
@@ -350,6 +377,13 @@ module OSM
     end
 
     # OpenStreetMap Way.
+    #
+    # To create a new OSM::Way object:
+    #   way = OSM::Way.new(1743, 'user', '2007-10-31T23:51:17Z')
+    #
+    # To get a way from the API:
+    #   way = OSM::Way.from_api(17)
+    #
     class Way < OSMObject
 
         # Array of node IDs in this way.
@@ -493,6 +527,13 @@ module OSM
     end
 
     # OpenStreetMap Relation.
+    #
+    # To create a new OSM::Relation object:
+    #   relation = OSM::Relation.new(331, 'user', '2007-10-31T23:51:53Z')
+    #
+    # To get a relation from the API:
+    #   relation = OSM::Relation.from_api(17)
+    #
     class Relation < OSMObject
 
         # Array of Member objects

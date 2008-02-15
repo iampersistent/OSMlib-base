@@ -1,6 +1,13 @@
 #!/usr/bin/ruby -w
+#-----------------------------------------------------------------------------
 #
 #  kml2osm -- Convert a KML file into an OSM file
+#
+#  Created by Jochen Topf <jochen@topf.org>
+#
+#  http://osmlib.rubyforge.org/
+#
+#-----------------------------------------------------------------------------
 #
 #  kml2osm reads the KML file named on the command line or STDIN
 #  and converts its contents into OSM data. Negative IDs are used
@@ -16,6 +23,14 @@
 #  form 'key=value'. Those will be converted into tags for the
 #  nodes and ways, respectively.
 #
+#-----------------------------------------------------------------------------
+#
+#  This work is released into the public domain. This applies worldwide.
+#  In case this is not legally possible, any entity is granted the right
+#  to use this work for any purpose, without any conditions, unless such
+#  conditions are required by law.
+#
+#-----------------------------------------------------------------------------
 
 require 'rubygems'
 require 'builder'
@@ -29,12 +44,7 @@ db = OSM::Database.new
 
 nodes_by_coordinate = Hash.new
 
-if ARGV.size > 0
-    file = File.new(ARGV[0])
-else
-    file = STDIN
-end
-doc = REXML::Document.new(file)
+doc = REXML::Document.new(ARGF)
 
 REXML::XPath.each(doc, '//Placemark') do |placemark|
 
