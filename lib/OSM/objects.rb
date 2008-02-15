@@ -23,6 +23,10 @@ module OSM
     class GeometryError < StandardError
     end
 
+    # An object was not found in the database.
+    class NotFoundError < StandardError
+    end
+
     # This is a virtual parent class for the OSM objects Node, Way and Relation.
     class OSMObject
 
@@ -581,6 +585,35 @@ module OSM
         # the right thing.
         def geometry
             raise NoGeometryError.new("Relations don't have a geometry")
+        end
+
+        # Returns a polygon made up of all the ways in this relation. This
+        # works only if it is tagged with 'polygon' or 'multipolygon'.
+        def polygon
+            raise OSM::NoDatabaseError.new("can't create Polygon from relation if it is not in a OSM::Database") if @db.nil?
+            raise OSM::NoDatabaseError.new("can't create Polygon from relation if it does not represent a polygon") if self['type'] != 'multipolygon' and self['type'] != 'polygon'
+
+            c = []
+            member_objects.each do |way|
+                raise TypeError.new("member is not a way so it can't be represented as Polygon") unless way.kind_of? OSM::Way
+                raise OSM::NotClosedError.new("way is not closed so it can't be represented as Polygon") unless way.is_closed?
+                raise OSM::GeometryError.new("way with less then three nodes can't be turned into a polygon") if way.nodes.size < 3
+                c << way.node_objects.collect{ |node| [node.lon.to_f, node.lat.to_f] }
+            end
+            GeoRuby::SimpleFeatures::Polygon.from_coordinates(c)
+        end
+
+        # Return all the member objects of this relation.
+        def member_objects
+            members.collect do |member|
+                obj = case member.type
+                    when :node,     'node'     then @db.get_node(member.ref)
+                    when :way,      'way'      then @db.get_way(member.ref)
+                    when :relation, 'relation' then @db.get_relation(member.ref)
+                end
+                raise OSM::NotFoundError.new("not in database: #{member.type} #{member.ref}") unless obj
+                obj
+            end
         end
 
         # Return string version of this Relation object.

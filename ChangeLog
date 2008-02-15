@@ -16,7 +16,8 @@ trunk
     * Many more tests
     * Added magic << methods to Node, Way, and Relation classes
     * Added missing method "key?" to check boolean tags
-	* Uses the new libxml callback API
+    * Uses the new libxml callback API
+    * Preliminary support for polygon relations
 
 0.1.1 2007-12-06
     Documentation updates

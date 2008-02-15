@@ -4,10 +4,12 @@ require 'OSM/objects.rb'
 
 module OSM
 
-    # An OSM database. It holds nodes, ways, and relations in memory. Contents are unordered.
+    # An OSM database. It holds nodes, ways, and relations in memory.
+    # Contents are unordered.
     #
-    # If you add an object to the database with the same ID as a previously added object, the old object will be silently
-    # deleted from the database and the new one will be added.
+    # If you add an object to the database with the same ID as a previously
+    # added object, the old object will be silently deleted from the database
+    # and the new one will be added.
     class Database
 
         @@DEFAULT_API_VERSION = '0.5'
@@ -90,7 +92,7 @@ module OSM
         # Get way from the database with given ID. Returns nil if there is no way
         # with this ID.
         #
-        # call-seq: get_node(id) -> OSM::Way or nil
+        # call-seq: get_way(id) -> OSM::Way or nil
         #
         def get_way(id)
             @ways[id.to_i]
@@ -99,7 +101,7 @@ module OSM
         # Get relation from the database with given ID. Returns nil if there is no relation
         # with this ID.
         #
-        # call-seq: get_node(id) -> OSM::Relation or nil
+        # call-seq: get_relation(id) -> OSM::Relation or nil
         #
         def get_relation(id)
             @relations[id.to_i]
