@@ -126,13 +126,11 @@ module OSM
         end
 
         # Create a new GeoRuby::Shp4r::ShpRecord with the geometry of
-        # this object and the given attributes. Will raise a
-        # NoGeometryError if the object is not associated with a geometry.
-        # Will raise a GeometryError if there is insufficient data to
-        # create a geometry such as not enough nodes in a way.
+        # this object and the given attributes.
         #
         # This only works if the GeoRuby library is included.
         #
+        # geom:: Geometry
         # attributes:: Hash with attributes
         #
         # call-seq: shape(attributes) -> GeoRuby::Shp4r::ShpRecord
@@ -141,19 +139,15 @@ module OSM
         #   require 'rubygems'
         #   require 'geo_ruby'
         #   node = Node(nil, nil, nil, 7.84, 54.34)
-        #   node.shape(:type => 'Pharmacy', :name => 'Hyde Park Pharmacy')
+        #   g = node.point
+        #   node.shape(g, :type => 'Pharmacy', :name => 'Hyde Park Pharmacy')
         #
-        def shape(attributes)
+        def shape(geom, attributes)
             fields = Hash.new
             attributes.each do |key, value|
                 fields[key.to_s] = value
             end
-            if attributes[:geometry]
-                g = self.send(attributes[:geometry])
-            else
-                g = geometry
-            end
-            GeoRuby::Shp4r::ShpRecord.new(g, fields)
+            GeoRuby::Shp4r::ShpRecord.new(geom, fields)
         end
 
         # Get all relations from the API that have his object as members.
@@ -339,14 +333,16 @@ module OSM
         #
         #   require 'rubygems'
         #   require 'geo_ruby'
-        #   geometry = OSM::Node.new(nil, nil, nil, 10.1, 20.2).geometry
+        #   geometry = OSM::Node.new(nil, nil, nil, 10.1, 20.2).point
         #
         # call-seq: geometry ->  GeoRuby::SimpleFeatures::Point
         #
-        def geometry
+        def point
             raise OSM::GeometryError.new("coordinates missing") if lon.nil? || lat.nil? || lon == '' || lat == ''
             GeoRuby::SimpleFeatures::Point.from_lon_lat(lon.to_f, lat.to_f)
         end
+
+        alias :geometry :point
 
         # Return string version of this node.
         # 

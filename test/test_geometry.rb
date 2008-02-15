@@ -15,6 +15,8 @@ class TestGeometry < Test::Unit::TestCase
         assert_kind_of GeoRuby::SimpleFeatures::Point, node.geometry
         assert_equal 10.4, node.geometry.lon
         assert_equal 40.3, node.geometry.lat
+        assert_equal 10.4, node.point.lon
+        assert_equal 40.3, node.point.lat
     end
 
     def test_node_geometry_nil
@@ -27,7 +29,7 @@ class TestGeometry < Test::Unit::TestCase
     def test_node_shape
         node = OSM::Node.new(1, nil, nil, 10.4, 40.3)
         attrs = {'a' => 'b', 'c' => 'd'}
-        shape = node.shape(attrs)
+        shape = node.shape(node.point, attrs)
         assert_kind_of GeoRuby::Shp4r::ShpRecord, shape
         assert_equal attrs, shape.data
         assert_kind_of GeoRuby::SimpleFeatures::Point, shape.geometry
