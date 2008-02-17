@@ -7,7 +7,7 @@ require 'OSM/StreamParser.rb'
 module OSM
 
     # Unspecified OSM API error.
-    class APIError < Exception; end
+    class APIError < StandardError; end
 
     # The API returned more than one OSM object where it should only have returned one.
     class APITooManyObjects < APIError; end

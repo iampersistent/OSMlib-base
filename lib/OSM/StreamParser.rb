@@ -13,8 +13,9 @@ require 'OSM/Database'
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
-    # This exception is raised by OSM::StreamParser when the OSM file has an unknown version.
-    class VersionError < Exception
+    # This exception is raised by OSM::StreamParser when the OSM file
+    # has an unknown version.
+    class VersionError < StandardError
     end
 
     # Implements the callbacks called by OSM::StreamParser while parsing the OSM
