@@ -1,4 +1,7 @@
 
+trunk
+    * Added parser classes using REXML stuff instead of libxml
+
 0.1.2 2008-02-18
     * Added OSM::API classes and some methods to call the API
     * Changed OSM::StreamParser so it can also parse strings, API change!
