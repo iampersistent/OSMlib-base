@@ -25,7 +25,7 @@ module OSM
     #
     #   result() - see below
     #
-    class Callbacks
+    class Callbacks < CallbacksBase
 
         include XML::SaxParser::Callbacks
 
@@ -63,7 +63,7 @@ module OSM
     end
 
     # Stream parser for OpenStreetMap XML files.
-    class StreamParser
+    class StreamParser < StreamParserBase
 
         # Create new StreamParser object. Only argument is a hash.
         #
