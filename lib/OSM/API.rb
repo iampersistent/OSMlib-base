@@ -3,7 +3,7 @@
 require 'net/http'
 require 'OSM'
 require 'OSM/objects'
-require "OSM/#{OSM::XMLPARSER}"
+require "OSM/StreamParser"
 
 module OSM
 

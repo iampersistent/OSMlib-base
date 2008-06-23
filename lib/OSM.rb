@@ -2,6 +2,6 @@ module OSM
 
     VERSION = '0.1.2'
 
-    XMLPARSER = 'StreamParserREXML'
+    XMLPARSER = 'REXML'
 
 end

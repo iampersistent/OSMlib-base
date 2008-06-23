@@ -1,6 +1,6 @@
 $: << 'lib'
-OSM::XMLPARSER='StreamParserLibxml'
-require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', OSM::XMLPARSER)
+OSM::XMLPARSER='Libxml'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'StreamParser')
 require 'test/unit'
 require 'rubygems'
 require 'builder'
