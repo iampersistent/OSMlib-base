@@ -86,7 +86,7 @@ module OSM
         def parse
             @callbacks.on_start_document
             @parser.parse(@data) do |type, name, data|
-                @position += parser.byteCount
+                @position += @parser.byteCount
                 @callbacks.on_start_element(name, data) if type == :START_ELEM
                 @callbacks.on_end_element(name) if type == :END_ELEM
             end

@@ -5,6 +5,12 @@ require 'OSM/Database'
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
+    @@XMLPARSER = ENV['OSMLIB_XML_PARSER'] || 'REXML'
+
+    def self.XMLParser
+        @@XMLPARSER
+    end
+
     # This exception is raised by OSM::StreamParser when the OSM file
     # has an unknown version.
     class VersionError < StandardError
@@ -133,7 +139,7 @@ module OSM
 
 end
 
-require "OSM/StreamParser/#{OSM::XMLPARSER}"
+require "OSM/StreamParser/#{OSM.XMLParser}"
 
 module OSM
 

@@ -1,7 +1,6 @@
 $: << 'lib'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'StreamParser')
 require 'test/unit'
-require 'rexml/document'
 require 'rubygems'
 require 'builder'
 
@@ -10,13 +9,17 @@ class CallbacksForTests < OSM::Callbacks
     include Test::Unit::Assertions
 
     def node(node)
-        assert_kind_of OSM::Node, node
+        @node = node
     end
 
     def way(way)
     end
 
     def relation(relation)
+    end
+
+    def result
+        @node
     end
 
 end
@@ -35,7 +38,9 @@ class TestParser < Test::Unit::TestCase
     def test_create_with_file
         parser = OSM::StreamParser.new(:filename => 'test/test.osm', :callbacks => CallbacksForTests.new)
         assert_kind_of OSM::StreamParser, parser
-        parser.parse
+        node = parser.parse
+        assert_kind_of OSM::Node, node
+        assert_equal "48.9629821", node.lat
     end
 
     def test_create_with_string
@@ -47,7 +52,9 @@ class TestParser < Test::Unit::TestCase
 </osm>
         })
         assert_kind_of OSM::StreamParser, parser
-        parser.parse
+        node = parser.parse
+        assert_kind_of OSM::Node, node
+        assert_equal "48.9614113", node.lat
     end
 
 end

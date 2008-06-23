@@ -25,7 +25,7 @@ be found at http://www.openstreetmap.org/ .
 
 * georuby
 * libxml-ruby (optional fast XML parser, needs reasonably new version)
-* xmlparser (optional fast XML parser)
+* xmlparser (optional fast XML parser) (Debian/Ubuntu: libxml-parser-ruby1.8)
 
 Dependencies are not all installed automatically when installing the gem
 packages because this breaks when the packages are already installed as
@@ -173,4 +173,14 @@ that the garbage collector can free the memory.
 == More examples
 
 For more examples see the examples directory.
+
+== Testing
+
+Call 'rake test' to run tests. You can change the XML parse the
+tests should use by setting the OSMLIB_XML_PARSER environment
+variable:
+
+  OSMLIB_XML_PARSER=REXML rake test  # (default)
+  OSMLIB_XML_PARSER=Libxml rake test
+  OSMLIB_XML_PARSER=Expat rake test
 
