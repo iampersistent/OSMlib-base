@@ -226,7 +226,7 @@ module OSM
             if id.kind_of?(Integer)
                 return id
             elsif id.kind_of?(String)
-                raise ArgumentError, "ID must be an integer" unless id =~ /^[0-9]+$/
+                raise ArgumentError, "ID must be an integer" unless id =~ /^-?[0-9]+$/
                 return id.to_i
             else
                 raise ArgumentError, "ID must be integer or string with integer"

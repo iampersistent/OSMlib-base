@@ -24,10 +24,12 @@ class TestNode < Test::Unit::TestCase
         node1 = OSM::Node.new
         node2 = OSM::Node.new
         node3 = OSM::Node.new(4)
+        node4 = OSM::Node.new(-3)
         assert node1.id < 0
         assert node2.id < 0
         assert_not_equal node1.id, node2.id
         assert_equal 4, node3.id
+        assert_equal -3, node4.id
     end
 
     def test_set_id

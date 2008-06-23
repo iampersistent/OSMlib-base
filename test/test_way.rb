@@ -24,10 +24,12 @@ class TestWay < Test::Unit::TestCase
         way1 = OSM::Way.new
         way2 = OSM::Way.new
         way3 = OSM::Way.new(4)
+        way4 = OSM::Way.new(-3)
         assert way1.id < 0
         assert way2.id < 0
         assert_not_equal way1.id, way2.id
         assert_equal 4, way3.id
+        assert_equal -3, way4.id
     end
 
     def test_set_id

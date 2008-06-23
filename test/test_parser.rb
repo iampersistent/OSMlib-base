@@ -57,4 +57,18 @@ class TestParser < Test::Unit::TestCase
         assert_equal "48.9614113", node.lat
     end
 
+    def test_create_with_string
+        parser = OSM::StreamParser.new(:callbacks => CallbacksForTests.new, :string => %q{<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.5" generator="OpenStreetMap server">
+  <node id="-2" lat="48.9614113" lon="8.3046066" user="test" visible="true" timestamp="2007-04-09T22:16:39+01:00">
+    <tag k="created_by" v="JOSM"/>
+  </node>
+</osm>
+        })
+        assert_kind_of OSM::StreamParser, parser
+        node = parser.parse
+        assert_kind_of OSM::Node, node
+        assert_equal -2, node.id
+    end
+
 end

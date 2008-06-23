@@ -2,6 +2,8 @@
 trunk
 	* Added parser code for using REXML, Libxml, or Expat parser. REXML
 	  is now the default
+	* API call to relation history now available
+	* Negative IDs are now allowed on objects
 
 0.1.2 2008-02-18
     * Added OSM::API classes and some methods to call the API

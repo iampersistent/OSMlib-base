@@ -24,10 +24,12 @@ class TestRelation < Test::Unit::TestCase
         relation1 = OSM::Relation.new
         relation2 = OSM::Relation.new
         relation3 = OSM::Relation.new(4)
+        relation4 = OSM::Relation.new(-3)
         assert relation1.id < 0
         assert relation2.id < 0
         assert_not_equal relation1.id, relation2.id
         assert_equal 4, relation3.id
+        assert_equal -3, relation4.id
     end
 
     def test_set_id
