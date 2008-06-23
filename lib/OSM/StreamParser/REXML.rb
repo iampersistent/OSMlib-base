@@ -21,7 +21,7 @@ module OSM
     #
     #   result() - see below
     #
-    class Callbacks
+    class Callbacks < CallbacksBase
 
         include REXML::SAX2Listener
 
@@ -56,87 +56,10 @@ module OSM
             end
         end
 
-        # Overwrite this in a derived class. The default behaviour is to do nothing
-        # but to store all node objects in a OSM::Database if one was supplied when
-        # creating the OSM::StreamParser object.
-        def node(node)
-            true
-        end
-
-        # Overwrite this in a derived class. The default behaviour is to do nothing
-        # but to store all way objects in a OSM::Database if one was supplied when
-        # creating the OSM::StreamParser object.
-        def way(way)
-            true
-        end
-
-        # Overwrite this in a derived class. The default behaviour is to do nothing
-        # but to store all relation objects in a OSM::Database if one was supplied when
-        # creating the OSM::StreamParser object.
-        def relation(relation)
-            true
-        end
-
-        # Overwrite this in a derived class. Whatever this method returns will be
-        # returned from the OSM::StreamParser#parse method.
-        def result
-        end
-
-        private
-
-        def _start_osm(attr_hash)
-            if attr_hash['version'] != '0.5'
-                raise OSM::VersionError, 'OSM::StreamParser only understands OSM file version 0.5'
-            end
-        end
-
-        def _start_node(attr_hash)
-            @context = OSM::Node.new(attr_hash['id'], attr_hash['user'], attr_hash['timestamp'], attr_hash['lon'], attr_hash['lat'])
-        end
-
-        def _end_node()
-            @db << @context if node(@context) && ! @db.nil?
-        end
-
-        def _start_way(attr_hash)
-            @context = OSM::Way.new(attr_hash['id'], attr_hash['user'], attr_hash['timestamp'])
-        end
-
-        def _end_way()
-            @db << @context if way(@context) && ! @db.nil?
-        end
-
-        def _start_relation(attr_hash)
-            @context = OSM::Relation.new(attr_hash['id'], attr_hash['user'], attr_hash['timestamp'])
-        end
-
-        def _end_relation()
-            @db << @context if relation(@context) && ! @db.nil?
-        end
-
-        def _nd(attr_hash)
-            @context.nodes << attr_hash['ref']
-        end
-
-        def _tag(attr_hash)
-            if respond_to?(:tag)
-                return unless tag(@context, attr_hash['k'], attr_value['v'])
-            end
-            @context.add_tags( attr_hash['k'] => attr_hash['v'] )
-        end
-
-        def _member(attr_hash)
-            new_member = OSM::Member.new(attr_hash['type'], attr_hash['ref'], attr_hash['role'])
-            if respond_to?(:member)
-                return unless member(@context, new_member)
-            end
-            @context.members << new_member
-        end
-
     end
 
     # Stream parser for OpenStreetMap XML files.
-    class StreamParser
+    class StreamParser < StreamParserBase
 
         # Create new StreamParser object. Only argument is a hash.
         #
@@ -152,17 +75,7 @@ module OSM
         #
         # You can only use :filename or :string, not both.
         def initialize(options)
-            @filename = options[:filename]
-            @string = options[:string]
-            @db = options[:db]
-            @context = nil
-
-            if (@filename.nil? && @string.nil?) || ((!@filename.nil?) && (!@string.nil?))
-                raise ArgumentError.new('need either :filename or :string argument')
-            end
-
-            @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks]
-            @callbacks.db = @db
+            super(options)
 
             source = if @filename
                 File.new(@filename)
@@ -171,12 +84,6 @@ module OSM
             end
             @parser = REXML::Parsers::SAX2Parser.new(source)
             @parser.listen(@callbacks)
-        end
-
-        # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
-        def parse
-            @parser.parse
-            @callbacks.result
         end
 
     end
