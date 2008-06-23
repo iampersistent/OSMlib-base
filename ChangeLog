@@ -1,6 +1,7 @@
 
 trunk
-    * Added parser classes using REXML stuff instead of libxml
+    * Added parser classes using REXML stuff instead of libxml, they are the
+	  default now. Only needs libxml if you want faster parsing
 
 0.1.2 2008-02-18
     * Added OSM::API classes and some methods to call the API

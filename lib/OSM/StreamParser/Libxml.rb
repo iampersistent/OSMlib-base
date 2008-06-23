@@ -7,16 +7,8 @@ rescue LoadError
     require 'libxml'
 end
 
-require 'OSM/objects'
-require 'OSM/Database'
-
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
-
-    # This exception is raised by OSM::StreamParser when the OSM file
-    # has an unknown version.
-    class VersionError < StandardError
-    end
 
     # Implements the callbacks called by OSM::StreamParser while parsing the OSM
     # XML file.
@@ -147,37 +139,6 @@ module OSM
 
     end
 
-    # This callback class for OSM::StreamParser collects all objects found in the XML in
-    # an array and the OSM::StreamParser#parse method returns this array.
-    #
-    #   cb = OSM::ObjectListCallbacks.new
-    #   parser = OSM::StreamParser.new(:filename => 'filename.osm', :callbacks => cb)
-    #   objects = parser.parse
-    #
-    class ObjectListCallbacks < Callbacks
-
-        def start_document
-            @list = []
-        end
-
-        def node(node)
-            @list << node
-        end
-
-        def way(way)
-            @list << way
-        end
-
-        def relation(relation)
-            @list << relation
-        end
-
-        def result
-            @list
-        end
-
-    end
-
     # Stream parser for OpenStreetMap XML files.
     class StreamParser
 
@@ -207,18 +168,18 @@ module OSM
             @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks]
             @callbacks.db = @db
 
-            @sax_parser = XML::SaxParser.new
+            @parser = XML::SaxParser.new
             if @filename.nil?
-                @sax_parser.string = @string
+                @parser.string = @string
             else
-                @sax_parser.filename = @filename
+                @parser.filename = @filename
             end
-            @sax_parser.callbacks = @callbacks
+            @parser.callbacks = @callbacks
         end
 
         # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
         def parse
-            @sax_parser.parse
+            @parser.parse
             @callbacks.result
         end
 
