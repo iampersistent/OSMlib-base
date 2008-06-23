@@ -93,6 +93,8 @@ module OSM
 
     class StreamParserBase
 
+        attr_reader :position
+
         # Create new StreamParser object. Only argument is a hash.
         #
         # call-seq: OSM::StreamParser.new(:filename => 'filename.osm')
@@ -111,6 +113,7 @@ module OSM
             @string = options[:string]
             @db = options[:db]
             @context = nil
+            @position = 0
 
             if (@filename.nil? && @string.nil?) || ((!@filename.nil?) && (!@string.nil?))
                 raise ArgumentError.new('need either :filename or :string argument')

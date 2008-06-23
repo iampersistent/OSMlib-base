@@ -25,6 +25,7 @@ be found at http://www.openstreetmap.org/ .
 
 * georuby
 * libxml-ruby (optional fast XML parser, needs reasonably new version)
+* xmlparser (optional fast XML parser)
 
 Dependencies are not all installed automatically when installing the gem
 packages because this breaks when the packages are already installed as
