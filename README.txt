@@ -25,14 +25,13 @@ be found at http://www.openstreetmap.org/ .
 
 * georuby
 * libxml-ruby (optional fast XML parser, needs reasonably new version)
+  (Debian/Ubuntu: libxml-ruby1.8)
 * xmlparser (optional fast XML parser) (Debian/Ubuntu: libxml-parser-ruby1.8)
+* builder (Debian/Ubuntu: libbuilder-ruby1.8)
 
 Dependencies are not all installed automatically when installing the gem
 packages because this breaks when the packages are already installed as
 Debian packages.
-
-For Debian/Ubuntu install the following packages:
-* libbuilder-ruby1.8
 
 == Usage
 
@@ -90,9 +89,6 @@ See the OSM::API class for details.
 
 === The Stream Parser
 
-(NOTE: This API changed between version 0.1.1 and 0.1.2 of the
-osmlib-base library to better fit newer versions of libxml-ruby.)
-
 To parse an OSM XML file create a subclass of OSM::Callbacks and
 define the methods node(), way(), and relation() in it:
 
@@ -122,9 +118,11 @@ The methods node(), way(), or relation() will be called whenever
 the parser has parsed a complete node, way, or relation (i.e. after
 all tags, nodes in a way, or members of a relation are available).
 
-The parser is based on the C libxml2 parser, which should be faster
-then the pure Ruby parsers. It is a stream parser, so it will not
-read in the complete file but give you the contents bit by bit.
+There are several parser options available:
+
+* REXML (Default, slow, works on all machines, because it is part of the Ruby standard distribution)
+* Libxml (Based on the C libxml2 library, fast, new version needed, sometimes hard to install)
+* Expat (Based on C Expat library, fast)
 
 === Using a Database
 
