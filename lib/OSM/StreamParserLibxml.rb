@@ -1,7 +1,11 @@
-# Contains the OSM::StreamParser and OSM::Callbacks classes using REXML.
+# Contains the OSM::StreamParser and OSM::Callbacks classes using LibXML.
 
-require 'rexml/parsers/sax2parser'
-require 'rexml/sax2listener'
+require 'rubygems'
+begin
+    require 'xml/libxml'
+rescue LoadError
+    require 'libxml'
+end
 
 require 'OSM/objects'
 require 'OSM/Database'
@@ -31,20 +35,20 @@ module OSM
     #
     class Callbacks
 
-        include REXML::SAX2Listener
+        include XML::SaxParser::Callbacks
 
         # the OSM::Database used to store objects in
         attr_accessor :db
 
-#        def on_start_document   # :nodoc:
-#            start_document if respond_to?(:start_document)
-#        end
+        def on_start_document   # :nodoc:
+            start_document if respond_to?(:start_document)
+        end
 
-#        def on_end_document     # :nodoc:
-#            end_document if respond_to?(:end_document)
-#        end
+        def on_end_document     # :nodoc:
+            end_document if respond_to?(:end_document)
+        end
 
-        def start_element(uri, name, qname, attr_hash)   # :nodoc:
+        def on_start_element(name, attr_hash)   # :nodoc:
             case name
                 when 'osm'      then _start_osm(attr_hash)
                 when 'node'     then _start_node(attr_hash)
@@ -56,7 +60,7 @@ module OSM
             end
         end
 
-        def end_element(uri, name, qname)    # :nodoc:
+        def on_end_element(name)    # :nodoc:
             case name
                 when 'node'     then _end_node()
                 when 'way'      then _end_way()
@@ -203,18 +207,18 @@ module OSM
             @callbacks = options[:callbacks].nil? ? OSM::Callbacks.new : options[:callbacks]
             @callbacks.db = @db
 
-            source = if @filename
-                File.new(@filename)
+            @sax_parser = XML::SaxParser.new
+            if @filename.nil?
+                @sax_parser.string = @string
             else
-                @string
+                @sax_parser.filename = @filename
             end
-            @parser = REXML::Parsers::SAX2Parser.new(source)
-            @parser.listen(@callbacks)
+            @sax_parser.callbacks = @callbacks
         end
 
         # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
         def parse
-            @parser.parse
+            @sax_parser.parse
             @callbacks.result
         end
 

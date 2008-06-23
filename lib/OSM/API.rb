@@ -1,8 +1,9 @@
 # Contains the OSM::API class
 
 require 'net/http'
-require 'OSM/objects.rb'
-require 'OSM/StreamParser.rb'
+require 'OSM'
+require 'OSM/objects'
+require "OSM/#{OSM::XMLPARSER}"
 
 module OSM
 

@@ -1,5 +1,5 @@
 $: << 'lib'
-require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'StreamParser.rb')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'StreamParserREXML.rb')
 require 'test/unit'
 require 'rexml/document'
 require 'rubygems'
