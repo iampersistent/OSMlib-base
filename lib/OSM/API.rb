@@ -112,7 +112,6 @@ module OSM
         # call-seq: get_history(type, id) -> Array of OSM::Object
         #
         def get_history(type, id)
-            return [] if type == 'relation' # XXX currently broken in API
             api_call_with_type(type, id, "#{type}/#{id}/history")
         end
 
