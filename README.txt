@@ -23,6 +23,7 @@ be found at http://www.openstreetmap.org/ .
 
 == Dependencies
 
+* georuby
 * libxml-ruby (for XML parsing)
 
 Dependencies are not all installed automatically when installing the gem
@@ -31,6 +32,9 @@ Debian packages.
 
 You need a reasonably new version of libxml-ruby. The one in Ubuntu 7.10 is
 too old.
+
+For Debian/Ubuntu install the following packages:
+* libbuilder-ruby1.8
 
 == Usage
 
