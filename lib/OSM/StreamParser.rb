@@ -212,24 +212,14 @@ module OSM
 
     end
 
+    # This is the base class for the OSM::StreamParser::REXML, OSM::StreamParser::Libxml, and
+    # OSM::StreamParser::Expat classes. Do not instantiate this class!
     class StreamParserBase
 
+        # Byte position within the input stream. This is only updated by the Expat parser.
         attr_reader :position
 
-        # Create new StreamParser object. Only argument is a hash.
-        #
-        # call-seq: OSM::StreamParser.new(:filename => 'filename.osm')
-        #           OSM::StreamParser.new(:string => '...')
-        #
-        # The hash keys:
-        #   :filename  => name of XML file
-        #   :string    => XML string
-        #   :db        => an OSM::Database object
-        #   :callbacks => an OSM::Callbacks object (or more likely from a derived class)
-        #                 if none was given a new OSM:Callbacks object is created
-        #
-        # You can only use :filename or :string, not both.
-        def initialize(options)
+        def initialize(options) # :nodoc:
             @filename = options[:filename]
             @string = options[:string]
             @db = options[:db]
@@ -244,8 +234,7 @@ module OSM
             @callbacks.db = @db
         end
 
-        # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
-        def parse
+        def parse   # :nodoc:
             @parser.parse
             @callbacks.result
         end

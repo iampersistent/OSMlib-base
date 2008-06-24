@@ -24,9 +24,9 @@ be found at http://www.openstreetmap.org/ .
 == Dependencies
 
 * georuby
-* libxml-ruby (optional fast XML parser, needs reasonably new version)
+* libxml-ruby (optional C-based XML parser, needs reasonably new version)
   (Debian/Ubuntu: libxml-ruby1.8)
-* xmlparser (optional fast XML parser) (Debian/Ubuntu: libxml-parser-ruby1.8)
+* xmlparser (optional C-based XML parser) (Debian/Ubuntu: libxml-parser-ruby1.8)
 * builder (Debian/Ubuntu: libbuilder-ruby1.8)
 
 Dependencies are not all installed automatically when installing the gem
@@ -125,9 +125,11 @@ all tags, nodes in a way, or members of a relation are available).
 
 There are several parser options available:
 
-* REXML (Default, slow, works on all machines, because it is part of the Ruby standard distribution)
-* Libxml (Based on the C libxml2 library, fast, new version needed, sometimes hard to install)
-* Expat (Based on C Expat library, fast)
+* REXML (Default, slow, works on all machines, because it is part
+  of the Ruby standard distribution)
+* Libxml (Based on the C libxml2 library, faster than REXML, new
+  version needed, sometimes hard to install)
+* Expat (Based on C Expat library, faster than REXML)
 
 Since version 0.1.3 REXML is the default parser because many people
 had problems with the C-based parser. Change the parser by setting
