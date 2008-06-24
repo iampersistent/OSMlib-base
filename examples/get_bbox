@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+#-----------------------------------------------------------------------------
+#
+#  get_bbox -- Download OSM objects inside bounding box
+#
+#  Created by Jochen Topf <jochen@topf.org>
+#
+#  http://osmlib.rubyforge.org/
+#
+#-----------------------------------------------------------------------------
+#
+#  This is an example on how to use the OSM::API.get_bbox method. Call
+#  this script with the bbox parameters:
+#
+#  get_bbox <left> <bottom> <right> <top>
+#
+#  It will output the IDs of all nodes, ways, and relations in this bbox.
+#
+#-----------------------------------------------------------------------------
+#
+#  This work is released into the public domain. This applies worldwide.
+#  In case this is not legally possible, any entity is granted the right
+#  to use this work for any purpose, without any conditions, unless such
+#  conditions are required by law.
+#
+#-----------------------------------------------------------------------------
+
+$: << 'lib' << '../lib'
+require 'OSM/API'
+require 'OSM/Database'
+
+if ARGV.size != 4
+    STDERR.puts "Usage: get_bbox <left> <bottom> <right> <top>"
+    exit 1
+end
+
+@api = OSM::API.new
+
+db = @api.get_bbox(Float(ARGV[0]), Float(ARGV[1]), Float(ARGV[2]), Float(ARGV[3]))
+
+puts "Nodes: #{db.nodes.values.collect{ |o| o.id }.join(',')}"
+puts "Ways: #{db.ways.values.collect{ |o| o.id }.join(',')}"
+puts "Relations: #{db.relations.values.collect{ |o| o.id }.join(',')}"
+

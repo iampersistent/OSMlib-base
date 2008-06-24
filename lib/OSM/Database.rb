@@ -10,6 +10,11 @@ module OSM
     # If you add an object to the database with the same ID as a previously
     # added object, the old object will be silently deleted from the database
     # and the new one will be added.
+    #
+    # Usage:
+    #   require 'OSM/Database'
+    #   db = OSM::Database.new
+    #
     class Database
 
         @@DEFAULT_API_VERSION = '0.5'

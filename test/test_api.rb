@@ -102,6 +102,18 @@ class MockHTTPResponse
             when /^(node|way|relation)\/500$/
                 @code = 500
                 @body = ''
+            when /^map\?bbox/
+                @code = 200
+                @body = %q{<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.5" generator="OpenStreetMap server">
+  <node id="1" lat="48.1" lon="8.1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+    <tag k="created_by" v="JOSM"/>
+  </node>
+  <node id="2" lat="48.2" lon="8.2" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+    <tag k="created_by" v="JOSM"/>
+  </node>
+</osm>
+}
             else
                 raise ArgumentError.new("unknown parameter: '#{suffix}'")
         end
@@ -253,6 +265,30 @@ class TestAPI < Test::Unit::TestCase
         end
     end
 
+    def test_get_bbox_fail
+        assert_raise TypeError do
+            @api.get_bbox('a', 'b', 'c', 'd')
+        end
+        assert_raise TypeError do
+            @api.get_bbox(1, 2, 3, -200)
+        end
+        assert_raise TypeError do
+            @api.get_bbox(1, 2, -200, 3)
+        end
+        assert_raise TypeError do
+            @api.get_bbox(1, -200, 2, 3)
+        end
+        assert_raise TypeError do
+            @api.get_bbox(-200, 1, 2, 3)
+        end
+    end
+
+    def test_get_bbox
+        db = @mapi.get_bbox(8.1, 48.1, 8.2, 48.2)
+        assert_kind_of OSM::Database, db
+        assert_equal "48.1", db.get_node(1).lat
+        assert_equal "8.2", db.get_node(2).lon
+    end
 
 end
 

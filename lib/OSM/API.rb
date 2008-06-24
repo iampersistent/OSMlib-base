@@ -117,6 +117,24 @@ module OSM
             api_call_with_type(type, id, "#{type}/#{id}/history")
         end
 
+        # Get all objects in the bounding box (bbox) given by the left, bottom, right, and top
+        # parameters. They will be put into a OSM::Database object which is returned.
+        #
+        # call-seq: get_bbox(left, bottom, right, top) -> OSM::Database
+        #
+        def get_bbox(left, bottom, right, top)
+            raise TypeError.new('"left" value needs to be a number between -180 and 180') unless(left.kind_of?(Float) && left >= -180 && left <= 180)
+            raise TypeError.new('"bottom" value needs to be a number between -90 and 90') unless(bottom.kind_of?(Float) && bottom >= -90 && bottom <= 90)
+            raise TypeError.new('"right" value needs to be a number between -180 and 180') unless(right.kind_of?(Float) && right >= -180 && right <= 180)
+            raise TypeError.new('"top" value needs to be a number between -90 and 90') unless(top.kind_of?(Float) && top >= -90 && top <= 90)
+            response = get("map?bbox=#{left},#{bottom},#{right},#{top}")
+            check_response_codes(response)
+            db = OSM::Database.new
+            parser = OSM::StreamParser.new(:string => response.body, :db => db)
+            parser.parse
+            db
+        end
+
         private
 
         def api_call_with_type(type, id, path)
@@ -135,7 +153,7 @@ module OSM
         def get(suffix)
             uri = URI.parse(@base_uri + suffix)
             request = Net::HTTP.new(uri.host, uri.port)
-            request.get(uri.path)
+            request.get(uri.request_uri)
         end
 
         def check_response_codes(response)

@@ -1,6 +1,10 @@
 
 = Examples for OSM Library - Base
 
+== get_bbox
+
+Read bounding box from OSM API and output IDs of found objects.
+
 == kml2osm
 
 kml2osm reads a KML file and converts its contents into OSM data.
