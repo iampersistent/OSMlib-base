@@ -4,6 +4,7 @@ trunk
 	  is now the default
 	* API call to relation history now available
 	* Negative IDs are now allowed on objects
+	* Added OSM::API.get_bbox method
 
 0.1.2 2008-02-18
     * Added OSM::API classes and some methods to call the API
