@@ -33,6 +33,7 @@ module OSM
             end
         end
 
+        # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
         def parse
             @callbacks.on_start_document
             @parser.parse(@data) do |type, name, data|

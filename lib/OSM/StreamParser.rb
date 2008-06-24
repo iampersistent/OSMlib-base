@@ -234,11 +234,6 @@ module OSM
             @callbacks.db = @db
         end
 
-        def parse   # :nodoc:
-            @parser.parse
-            @callbacks.result
-        end
-
     end
 
     # Class to parse XML files. This is a factory class. When calling OSM::StreamParser.new()

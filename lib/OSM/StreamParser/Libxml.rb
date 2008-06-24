@@ -38,6 +38,12 @@ module OSM
             @parser.callbacks = @callbacks
         end
 
+        # Run the parser. Return value is the return value of the OSM::Callbacks#result method.
+        def parse
+            @parser.parse
+            @callbacks.result
+        end
+
     end
 
 end
