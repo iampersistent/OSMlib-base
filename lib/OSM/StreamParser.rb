@@ -30,6 +30,12 @@ module OSM
     class VersionError < StandardError
     end
 
+    # This exception is raised when you try to use an unknown XML parser
+    # by setting the environment variable OSMLIB_XML_PARSER to an unknown
+    # value.
+    class UnknownParserError < StandardError
+    end
+
     # Implements the callbacks called by OSM::StreamParser while parsing the OSM
     # XML file.
     #
@@ -47,10 +53,12 @@ module OSM
     #
     class Callbacks
 
-        if OSM.XMLParser == 'REXML'
-            include REXML::SAX2Listener
-        elsif OSM.XMLParser == 'Libxml'
-            include XML::SaxParser::Callbacks
+        case OSM.XMLParser
+            when 'REXML': include REXML::SAX2Listener
+            when 'Libxml': include XML::SaxParser::Callbacks
+            when 'Expat':
+            else
+                raise UnknownParserError
         end
 
         # the OSM::Database used to store objects in
@@ -173,6 +181,37 @@ module OSM
 
     end    
 
+    # This callback class for OSM::StreamParser collects all objects found in the XML in
+    # an array and the OSM::StreamParser#parse method returns this array.
+    #
+    #   cb = OSM::ObjectListCallbacks.new
+    #   parser = OSM::StreamParser.new(:filename => 'filename.osm', :callbacks => cb)
+    #   objects = parser.parse
+    #
+    class ObjectListCallbacks < Callbacks
+
+        def start_document
+            @list = []
+        end
+
+        def node(node)
+            @list << node
+        end
+
+        def way(way)
+            @list << way
+        end
+
+        def relation(relation)
+            @list << relation
+        end
+
+        def result
+            @list
+        end
+
+    end
+
     class StreamParserBase
 
         attr_reader :position
@@ -213,42 +252,37 @@ module OSM
 
     end
 
-end
-
-require "OSM/StreamParser/#{OSM.XMLParser}"
-
-module OSM
-
-    # This callback class for OSM::StreamParser collects all objects found in the XML in
-    # an array and the OSM::StreamParser#parse method returns this array.
+    # Class to parse XML files. This is a factory class. When calling OSM::StreamParser.new()
+    # an object of one of the following classes is created and returned:
+    # OSM::StreamParser::REXML, OSM::StreamParser::Libxml, OSM::StreamParser::Expat.
     #
-    #   cb = OSM::ObjectListCallbacks.new
-    #   parser = OSM::StreamParser.new(:filename => 'filename.osm', :callbacks => cb)
-    #   objects = parser.parse
+    # Usage:
+    #   ENV['OSMLIB_XML_PARSER'] = 'Libxml'
+    #   require 'OSM/StreamParser'
+    #   parser = OSM::Streamparser.new(:filename => 'file.osm')
     #
-    class ObjectListCallbacks < Callbacks
+    class StreamParser
 
-        def start_document
-            @list = []
-        end
-
-        def node(node)
-            @list << node
-        end
-
-        def way(way)
-            @list << way
-        end
-
-        def relation(relation)
-            @list << relation
-        end
-
-        def result
-            @list
+        # Create new StreamParser object. Only argument is a hash.
+        #
+        # call-seq: OSM::StreamParser.new(:filename => 'filename.osm')
+        #           OSM::StreamParser.new(:string => '...')
+        #
+        # The hash keys:
+        #   :filename  => name of XML file
+        #   :string    => XML string
+        #   :db        => an OSM::Database object
+        #   :callbacks => an OSM::Callbacks object (or more likely from a derived class)
+        #                 if none was given a new OSM:Callbacks object is created
+        #
+        # You can only use :filename or :string, not both.
+        def self.new(options)
+            eval "OSM::StreamParser::#{OSM.XMLParser}.new(options)"
         end
 
     end
 
 end
+
+require "OSM/StreamParser/#{OSM.XMLParser}"
 

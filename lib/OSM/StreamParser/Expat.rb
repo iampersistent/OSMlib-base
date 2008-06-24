@@ -1,4 +1,4 @@
-# Contains the OSM::StreamParser and OSM::Callbacks classes using Expat.
+# Contains the OSM::StreamParser::Expat class.
 
 require 'rubygems'
 require 'xmlparser'
@@ -6,8 +6,8 @@ require 'xmlparser'
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
-    # Stream parser for OpenStreetMap XML files.
-    class StreamParser < StreamParserBase
+    # Stream parser for OpenStreetMap XML files using Expat.
+    class StreamParser::Expat < StreamParserBase
 
         # Create new StreamParser object. Only argument is a hash.
         #

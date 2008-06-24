@@ -1,4 +1,4 @@
-# Contains the OSM::StreamParser and OSM::Callbacks classes using REXML.
+# Contains the OSM::StreamParser::REXML class.
 
 require 'rexml/parsers/sax2parser'
 require 'rexml/sax2listener'
@@ -7,7 +7,7 @@ require 'rexml/sax2listener'
 module OSM
 
     # Stream parser for OpenStreetMap XML files.
-    class StreamParser < StreamParserBase
+    class StreamParser::REXML < StreamParserBase
 
         # Create new StreamParser object. Only argument is a hash.
         #

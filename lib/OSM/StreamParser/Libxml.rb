@@ -1,4 +1,4 @@
-# Contains the OSM::StreamParser and OSM::Callbacks classes using LibXML.
+# Contains the OSM::StreamParser::LibXML class.
 
 require 'rubygems'
 begin
@@ -10,8 +10,8 @@ end
 # Namespace for modules and classes related to the OpenStreetMap project.
 module OSM
 
-    # Stream parser for OpenStreetMap XML files.
-    class StreamParser < StreamParserBase
+    # Stream parser for OpenStreetMap XML files using Libxml.
+    class StreamParser::Libxml < StreamParserBase
 
         # Create new StreamParser object. Only argument is a hash.
         #
