@@ -1,7 +1,7 @@
 
 0.1.3 2008-06-24
 	* Added parser code for using REXML, Libxml, or Expat parser. REXML
-	  is now the default
+	  is now the default (Thanks to Nolan Darilek for the Expat code).
 	* API call to relation history now available
 	* Negative IDs are now allowed on objects
 	* Added OSM::API.get_bbox method
