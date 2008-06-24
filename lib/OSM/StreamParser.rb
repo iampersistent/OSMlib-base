@@ -15,8 +15,31 @@ module OSM
     class VersionError < StandardError
     end
 
-    # Base class for StreamParser callbacks. Never use this directly!
-    class CallbacksBase
+    # Implements the callbacks called by OSM::StreamParser while parsing the OSM
+    # XML file.
+    #
+    # To create your own behaviour, create a subclass of this class and (re)define
+    # the following methods:
+    #
+    #   node(node) - see below
+    #   way(way) - see below
+    #   relation(relation) - see below
+    #
+    #   start_document() - called once at start of document
+    #   end_document() - called once at end of document
+    #
+    #   result() - see below
+    #
+    class Callbacks
+
+        if OSM::XMLParser == 'REXML'
+            include REXML::SAX2Listener
+        elsif OSM::XMLParser == 'Libxml'
+            include XML::SaxParser::Callbacks
+        end
+
+        # the OSM::Database used to store objects in
+        attr_accessor :db
 
         # Overwrite this in a derived class. The default behaviour is to do nothing
         # but to store all node objects in a OSM::Database if one was supplied when
@@ -42,6 +65,54 @@ module OSM
         # Overwrite this in a derived class. Whatever this method returns will be
         # returned from the OSM::StreamParser#parse method.
         def result
+        end
+
+        def on_start_document   # :nodoc:
+            start_document if respond_to?(:start_document)
+        end
+
+        def on_end_document     # :nodoc:
+            end_document if respond_to?(:end_document)
+        end
+
+        def on_start_element(name, attr_hash)   # :nodoc:
+            case name
+                when 'osm'      then _start_osm(attr_hash)
+                when 'node'     then _start_node(attr_hash)
+                when 'way'      then _start_way(attr_hash)
+                when 'relation' then _start_relation(attr_hash)
+                when 'tag'      then _tag(attr_hash)
+                when 'nd'       then _nd(attr_hash)
+                when 'member'   then _member(attr_hash)
+            end
+        end
+
+        def on_end_element(name)    # :nodoc:
+            case name
+                when 'node'     then _end_node()
+                when 'way'      then _end_way()
+                when 'relation' then _end_relation()
+            end
+        end
+
+        def start_element(uri, name, qname, attr_hash)   # :nodoc:
+            case name
+                when 'osm'      then _start_osm(attr_hash)
+                when 'node'     then _start_node(attr_hash)
+                when 'way'      then _start_way(attr_hash)
+                when 'relation' then _start_relation(attr_hash)
+                when 'tag'      then _tag(attr_hash)
+                when 'nd'       then _nd(attr_hash)
+                when 'member'   then _member(attr_hash)
+            end
+        end
+
+        def end_element(uri, name, qname)    # :nodoc:
+            case name
+                when 'node'     then _end_node()
+                when 'way'      then _end_way()
+                when 'relation' then _end_relation()
+            end
         end
 
         private
