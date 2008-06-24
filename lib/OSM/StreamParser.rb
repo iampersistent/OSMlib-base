@@ -32,9 +32,9 @@ module OSM
     #
     class Callbacks
 
-        if OSM::XMLParser == 'REXML'
+        if OSM.XMLParser == 'REXML'
             include REXML::SAX2Listener
-        elsif OSM::XMLParser == 'Libxml'
+        elsif OSM.XMLParser == 'Libxml'
             include XML::SaxParser::Callbacks
         end
 
