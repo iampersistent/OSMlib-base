@@ -1,5 +1,5 @@
 
-trunk
+0.1.3 2008-06-24
 	* Added parser code for using REXML, Libxml, or Expat parser. REXML
 	  is now the default
 	* API call to relation history now available
