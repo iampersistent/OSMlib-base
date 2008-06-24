@@ -244,6 +244,7 @@ module OSM
     #   ENV['OSMLIB_XML_PARSER'] = 'Libxml'
     #   require 'OSM/StreamParser'
     #   parser = OSM::Streamparser.new(:filename => 'file.osm')
+    #   result = parser.parse
     #
     class StreamParser
 
