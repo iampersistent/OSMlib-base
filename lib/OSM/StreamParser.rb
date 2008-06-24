@@ -10,6 +10,21 @@ module OSM
         @@XMLPARSER
     end
 
+    if OSM.XMLParser == 'REXML'
+        require 'rexml/parsers/sax2parser'
+        require 'rexml/sax2listener'
+    elsif OSM.XMLParser == 'Libxml'
+        require 'rubygems'
+        begin
+            require 'xml/libxml'
+        rescue LoadError
+            require 'libxml'
+        end
+    elsif OSM.XMLParser == 'Expat'
+        require 'rubygems'
+        require 'xmlparser'
+    end
+
     # This exception is raised by OSM::StreamParser when the OSM file
     # has an unknown version.
     class VersionError < StandardError
@@ -95,24 +110,14 @@ module OSM
             end
         end
 
+        # used by REXML
         def start_element(uri, name, qname, attr_hash)   # :nodoc:
-            case name
-                when 'osm'      then _start_osm(attr_hash)
-                when 'node'     then _start_node(attr_hash)
-                when 'way'      then _start_way(attr_hash)
-                when 'relation' then _start_relation(attr_hash)
-                when 'tag'      then _tag(attr_hash)
-                when 'nd'       then _nd(attr_hash)
-                when 'member'   then _member(attr_hash)
-            end
+            on_start_element(name, attr_hash)
         end
 
+        # used by REXML
         def end_element(uri, name, qname)    # :nodoc:
-            case name
-                when 'node'     then _end_node()
-                when 'way'      then _end_way()
-                when 'relation' then _end_relation()
-            end
+            on_end_element(name)
         end
 
         private
