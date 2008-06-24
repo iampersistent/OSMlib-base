@@ -1,4 +1,3 @@
-
 require 'OSM/objects'
 require 'OSM/Database'
 
@@ -16,6 +15,7 @@ module OSM
     class VersionError < StandardError
     end
 
+    # Base class for StreamParser callbacks. Never use this directly!
     class CallbacksBase
 
         # Overwrite this in a derived class. The default behaviour is to do nothing

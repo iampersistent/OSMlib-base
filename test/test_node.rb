@@ -1,5 +1,5 @@
 $: << 'lib'
-require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects.rb')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'objects')
 require 'test/unit'
 
 class TestNode < Test::Unit::TestCase

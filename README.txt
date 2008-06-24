@@ -41,6 +41,9 @@ The library provides classes for the three basic building blocks of any
 OSM database: OSM::Node, OSM::Way, and OSM::Relation. They are all subclasses
 of OSM::OSMObject.
 
+  # support for basic OSM objects
+  require 'OSM/objects'
+
   # create a node
   node = OSM::Node.new(17, 'user', '2007-10-31T23:48:54Z', 7.4, 53.2)
 
@@ -110,6 +113,8 @@ define the methods node(), way(), and relation() in it:
 
 Instantiate an object of this class and give it to a OSM::StreamParser:
 
+  require 'OSM/StreamParser'
+
   cb = MyCallbacks.new
   parser = OSM::StreamParser.new(:filename => 'filename.osm', :callbacks => cb)
   parser.parse
@@ -124,10 +129,24 @@ There are several parser options available:
 * Libxml (Based on the C libxml2 library, fast, new version needed, sometimes hard to install)
 * Expat (Based on C Expat library, fast)
 
+Since version 0.1.3 REXML is the default parser because many people
+had problems with the C-based parser. Change the parser by setting
+the environment variable OSMLIB_XML_PARSER to the parser you want
+to use (before you require 'OSM/StreamParser'):
+
+From the shell:
+    export OSMLIBX_XML_PARSER=Libxml
+
+From ruby:
+    ENV['OSMLIBX_XML_PARSER']=Libxml
+    require 'OSM/StreamParser'
+
 === Using a Database
 
 If you want the parser to keep track of all the objects it finds in
 the XML file you can create a OSM::Database for it:
+
+  require 'OSM/Database'
 
   db = OSM::Database.new
 
@@ -174,7 +193,7 @@ For more examples see the examples directory.
 
 == Testing
 
-Call 'rake test' to run tests. You can change the XML parse the
+Call 'rake test' to run tests. You can change the XML parser the
 tests should use by setting the OSMLIB_XML_PARSER environment
 variable:
 

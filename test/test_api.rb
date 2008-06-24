@@ -1,5 +1,5 @@
 $: << 'lib'
-require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'API.rb')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'OSM', 'API')
 require 'test/unit'
 
 require 'net/http'

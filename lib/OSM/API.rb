@@ -34,6 +34,8 @@ module OSM
     # The OSM::API class handles all calls to the OpenStreetMap API.
     #
     # Usage:
+    #   require 'OSM/API'
+    #
     #   @api = OSM::API.new
     #   node = @api.get_node(3437)
     #
