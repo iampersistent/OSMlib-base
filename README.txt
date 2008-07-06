@@ -140,7 +140,7 @@ From the shell:
     export OSMLIBX_XML_PARSER=Libxml
 
 From ruby:
-    ENV['OSMLIBX_XML_PARSER']=Libxml
+    ENV['OSMLIBX_XML_PARSER']='Libxml'
     require 'OSM/StreamParser'
 
 === Using a Database
