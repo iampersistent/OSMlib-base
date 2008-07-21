@@ -50,7 +50,7 @@ EOF
     s.has_rdoc = true
     s.extra_rdoc_files = ['README.txt', 'examples/README.txt']
 
-    s.files = FileList["lib/**/*.rb", "LICENSE", "rakefile.rb"] + s.test_files + s.extra_rdoc_files
+    s.files = FileList['lib/**/*.rb', 'LICENSE', 'rakefile.rb', 'examples/*'] + s.test_files + s.extra_rdoc_files
     s.rdoc_options.concat ['--main',  'README.txt']
 
     # commented out because this doesn't work when libxml-ruby is installed as a Debian package
