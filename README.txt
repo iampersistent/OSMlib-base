@@ -137,10 +137,10 @@ the environment variable OSMLIB_XML_PARSER to the parser you want
 to use (before you require 'OSM/StreamParser'):
 
 From the shell:
-    export OSMLIBX_XML_PARSER=Libxml
+    export OSMLIB_XML_PARSER=Libxml
 
 From ruby:
-    ENV['OSMLIBX_XML_PARSER']='Libxml'
+    ENV['OSMLIB_XML_PARSER']='Libxml'
     require 'OSM/StreamParser'
 
 === Using a Database
