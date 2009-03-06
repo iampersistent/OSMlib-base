@@ -518,7 +518,7 @@ module OSM
         def to_xml(xml)
             xml.way(attributes) do |xml|
                 nodes.each do |node|
-                    xml.nd(:ref => node.id)
+                    xml.nd(:ref => node)
                 end
                 tags.to_xml(xml)
             end

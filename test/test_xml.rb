@@ -100,8 +100,8 @@ class TestXml < Test::Unit::TestCase
     def test_way
         way = OSM::Way.new(4, 'foo', '2000-01-01T00:00:00Z')
         way.add_tags('highway' => 'residential', 'name' => 'Harbour Street')
-        way.nodes << OSM::Node.new(42)
-        way.nodes << OSM::Node.new(43)
+        way << OSM::Node.new(42)
+        way << OSM::Node.new(43)
         way.to_xml(@doc)
 
         rexml = REXML::Document.new(@out)
