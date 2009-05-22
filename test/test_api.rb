@@ -15,8 +15,8 @@ class MockHTTPResponse
             when 'node/1'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <node id="1" lat="48.1" lon="8.1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+<osm version="0.6" generator="OpenStreetMap server">
+  <node id="1" version="1" lat="48.1" lon="8.1" uid="1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
     <tag k="created_by" v="JOSM"/>
   </node>
 </osm>
@@ -24,11 +24,11 @@ class MockHTTPResponse
             when 'node/2'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <node id="1" lat="48.1" lon="8.1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+<osm version="0.6" generator="OpenStreetMap server">
+  <node id="1" version="1" lat="48.1" lon="8.1" uid="1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
     <tag k="created_by" v="JOSM"/>
   </node>
-  <node id="2" lat="48.2" lon="8.2" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+  <node id="2" version="1" lat="48.2" lon="8.2" uid="1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
     <tag k="created_by" v="JOSM"/>
   </node>
 </osm>
@@ -36,8 +36,8 @@ class MockHTTPResponse
             when 'way/1'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <way id="1" visible="true" timestamp="2007-06-03T20:02:39+01:00" user="u">
+<osm version="0.6" generator="OpenStreetMap server">
+  <way id="1" version="1" visible="true" timestamp="2007-06-03T20:02:39+01:00" uid="1" user="u">
     <nd ref="1"/>
     <nd ref="2"/>
     <nd ref="3"/>
@@ -49,15 +49,15 @@ class MockHTTPResponse
             when 'way/2'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <way id="1" visible="true" timestamp="2007-06-03T20:02:39+01:00" user="u">
+<osm version="0.6" generator="OpenStreetMap server">
+  <way id="1" version="1" visible="true" timestamp="2007-06-03T20:02:39+01:00" uid="1" user="u">
     <nd ref="1"/>
     <nd ref="2"/>
     <nd ref="3"/>
     <tag k="created_by" v="osmeditor2"/>
     <tag k="highway" v="residential"/>
   </way>
-  <way id="2" visible="true" timestamp="2007-06-03T20:02:39+01:00" user="u">
+  <way id="2" version="1" visible="true" timestamp="2007-06-03T20:02:39+01:00" uid="1" user="u">
     <nd ref="4"/>
     <nd ref="5"/>
     <nd ref="6"/>
@@ -69,8 +69,8 @@ class MockHTTPResponse
             when 'relation/1'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <relation id="1" visible="true" timestamp="2007-07-24T16:18:51+01:00" user="u">
+<osm version="0.6" generator="OpenStreetMap server">
+  <relation id="1" version="1" visible="true" timestamp="2007-07-24T16:18:51+01:00" uid="1" user="u">
     <member type="way" ref="1" role=""/>
     <member type="way" ref="2" role=""/>
     <tag k="type" v="something"/>
@@ -80,13 +80,13 @@ class MockHTTPResponse
             when 'relation/2'
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <relation id="1" visible="true" timestamp="2007-07-24T16:18:51+01:00" user="u">
+<osm version="0.6" generator="OpenStreetMap server">
+  <relation id="1" version="1" visible="true" timestamp="2007-07-24T16:18:51+01:00" uid="1" user="u">
     <member type="way" ref="1" role=""/>
     <member type="way" ref="2" role=""/>
     <tag k="type" v="something"/>
   </relation>
-  <relation id="2" visible="true" timestamp="2007-07-24T16:18:51+01:00" user="u">
+  <relation id="2" version="1" visible="true" timestamp="2007-07-24T16:18:51+01:00" uid="1" user="u">
     <member type="way" ref="3" role=""/>
     <member type="way" ref="4" role=""/>
     <tag k="type" v="something"/>
@@ -105,11 +105,11 @@ class MockHTTPResponse
             when /^map\?bbox/
                 @code = 200
                 @body = %q{<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.5" generator="OpenStreetMap server">
-  <node id="1" lat="48.1" lon="8.1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+<osm version="0.6" generator="OpenStreetMap server">
+  <node id="1" version="1" lat="48.1" lon="8.1" uid="1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
     <tag k="created_by" v="JOSM"/>
   </node>
-  <node id="2" lat="48.2" lon="8.2" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
+  <node id="2" version="1" lat="48.2" lon="8.2" uid="1" user="u" visible="true" timestamp="2007-07-03T00:04:12+01:00">
     <tag k="created_by" v="JOSM"/>
   </node>
 </osm>
@@ -134,7 +134,7 @@ class TestAPI < Test::Unit::TestCase
 
     def test_create_std
         assert_kind_of OSM::API, @api
-        assert_equal 'http://www.openstreetmap.org/api/0.5/', @api.instance_variable_get(:@base_uri)
+        assert_equal 'http://www.openstreetmap.org/api/0.6/', @api.instance_variable_get(:@base_uri)
     end
 
     def test_create_uri

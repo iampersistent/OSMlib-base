@@ -45,7 +45,7 @@ module OSM
     class API
 
         # the default base URI for the API
-        DEFAULT_BASE_URI = 'http://www.openstreetmap.org/api/0.5/'
+        DEFAULT_BASE_URI = 'http://www.openstreetmap.org/api/0.6/'
 
         # Creates a new API object. Without any arguments it uses the default API at
         # DEFAULT_BASE_URI. If you want to use a different API, give the base URI

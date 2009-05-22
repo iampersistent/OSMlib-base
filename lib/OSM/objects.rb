@@ -37,9 +37,19 @@ module OSM
         # Unique ID
         attr_reader :id
 
+        # The version of this object (as read from file, it
+        # is not updated by operations to this object)
+        # API 0.6 and above only
+        attr_accessor :version
+
         # The user who last edited this object (as read from file, it
         # is not updated by operations to this object)
         attr_accessor :user
+
+        # The user id of the user who last edited this object (as read from file, it
+        # is not updated by operations to this object)
+        # API 0.6 and above only
+        attr_accessor :uid
 
         # Last change of this object (as read from file, it is not
         # updated by operations to this object)
@@ -57,10 +67,12 @@ module OSM
             api.get_object(type, id)
         end
 
-        def initialize(id, user, timestamp) #:nodoc:
+        def initialize(id, user, timestamp, uid=-1, version=1) #:nodoc:
             raise NotImplementedError.new('OSMObject is a virtual base class for the Node, Way, and Relation classes') if self.class == OSM::OSMObject
 
             @id = id.nil? ? _next_id : _check_id(id)
+            @version = version
+            @uid = uid
             @user = user
             @timestamp = _check_timestamp(timestamp) unless timestamp.nil?
             @db = nil
@@ -80,7 +92,7 @@ module OSM
 
         # The list of attributes for this object
         def attribute_list # :nodoc:
-            [:id, :user, :timestamp]
+            [:id, :version, :uid, :user, :timestamp]
         end
 
         # Returns a hash of all non-nil attributes of this object.
@@ -281,10 +293,10 @@ module OSM
         # Create new Node object.
         #
         # If +id+ is +nil+ a new unique negative ID will be allocated.
-        def initialize(id=nil, user=nil, timestamp=nil, lon=nil, lat=nil)
+        def initialize(id=nil, user=nil, timestamp=nil, lon=nil, lat=nil, uid=-1, version=1)
             @lon = _check_lon(lon) unless lon.nil?
             @lat = _check_lat(lat) unless lat.nil?
-            super(id, user, timestamp)
+            super(id, user, timestamp, uid, version)
         end
 
         def type
@@ -303,7 +315,7 @@ module OSM
 
         # List of attributes for a Node
         def attribute_list
-            [:id, :user, :timestamp, :lon, :lat]
+            [:id, :version, :uid, :user, :timestamp, :lon, :lat]
         end
 
         # Add one or more tags to this node.
@@ -395,9 +407,9 @@ module OSM
         # user:: Username
         # timestamp:: Timestamp of last change
         # nodes:: Array of Node objects and/or node IDs
-        def initialize(id=nil, user=nil, timestamp=nil, nodes=[])
+        def initialize(id=nil, user=nil, timestamp=nil, nodes=[], uid=-1, version=1)
             @nodes = nodes.collect{ |node| node.kind_of?(OSM::Node) ? node.id : node }
-            super(id, user, timestamp)
+            super(id, user, timestamp, uid, version)
         end
 
         def type
@@ -542,9 +554,9 @@ module OSM
         # Create new Relation object.
         #
         # If +id+ is +nil+ a new unique negative ID will be allocated.
-        def initialize(id=nil, user=nil, timestamp=nil, members=[])
+        def initialize(id=nil, user=nil, timestamp=nil, members=[], uid=-1, version=1)
             @members = members
-            super(id, user, timestamp)
+            super(id, user, timestamp, uid, version)
         end
 
         def type

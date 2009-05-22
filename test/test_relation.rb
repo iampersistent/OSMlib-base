@@ -5,7 +5,7 @@ require 'test/unit'
 class TestRelation < Test::Unit::TestCase
 
     def test_create
-        relation = OSM::Relation.new(123, 'somebody', '2007-02-20T10:29:49+00:00')
+        relation = OSM::Relation.new(123, 'somebody', '2007-02-20T10:29:49+00:00', [], 3, 5)
         assert_kind_of OSM::Relation, relation
         assert_equal 123, relation.id
         assert_equal 'somebody', relation.user
@@ -16,7 +16,7 @@ class TestRelation < Test::Unit::TestCase
         assert relation.tags.empty?
         assert_nil relation.tags['foo']
 
-        hash = {:id => 123, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00'}
+        hash = {:id => 123, :version => 5, :uid => 3, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00'}
         assert_equal hash, relation.attributes
     end
 

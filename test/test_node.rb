@@ -5,7 +5,7 @@ require 'test/unit'
 class TestNode < Test::Unit::TestCase
 
     def test_create
-        node = OSM::Node.new(17, 'somebody', '2007-02-20T10:29:49+00:00', 8.5, 47.5)
+        node = OSM::Node.new(17, 'somebody', '2007-02-20T10:29:49+00:00', 8.5, 47.5, 5, 3)
         assert_kind_of OSM::Node, node
         assert_equal 17, node.id
         assert_equal 'somebody', node.user
@@ -16,7 +16,7 @@ class TestNode < Test::Unit::TestCase
         assert node.tags.empty?
         assert_nil node.tags['foo']
 
-        hash = {:id => 17, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00', :lon => '8.5', :lat => '47.5'}
+        hash = {:id => 17, :version => 3, :uid => 5, :user => 'somebody', :timestamp => '2007-02-20T10:29:49+00:00', :lon => '8.5', :lat => '47.5'}
         assert_equal hash, node.attributes
     end
 

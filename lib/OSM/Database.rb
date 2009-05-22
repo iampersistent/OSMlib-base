@@ -17,7 +17,7 @@ module OSM
     #
     class Database
 
-        @@DEFAULT_API_VERSION = '0.5'
+        @@DEFAULT_API_VERSION = '0.6'
         @@DEFAULT_XML_GENERATOR = 'Ruby-OSMLib'
 
         # OpenStreetMap API version of this database

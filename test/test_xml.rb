@@ -177,7 +177,7 @@ class TestXml < Test::Unit::TestCase
         assert_equal 'foo', REXML::XPath.first(element, 'member/@role').value
     end
 
-    # <osm version="0.5" generator="test">
+    # <osm version="0.6" generator="test">
     #   <node id="-1"/>
     #   <way id="-2"/>
     #   <relation id="-3"/>
@@ -194,7 +194,7 @@ class TestXml < Test::Unit::TestCase
         assert_kind_of REXML::Element, element
         assert_equal 'osm', element.name
 
-        assert_equal '0.5',  REXML::XPath.first(element, '/osm/@version').value
+        assert_equal '0.6',  REXML::XPath.first(element, '/osm/@version').value
         assert_equal 'test', REXML::XPath.first(element, '/osm/@generator').value
 
         assert_equal 'node',     REXML::XPath.first(element, '/osm/[1]').name

@@ -131,8 +131,8 @@ module OSM
         private
 
         def _start_osm(attr_hash)
-            if attr_hash['version'] != '0.5'
-                raise OSM::VersionError, 'OSM::StreamParser only understands OSM file version 0.5'
+            if attr_hash['version'] != '0.5' && attr_hash['version'] != '0.6'
+                raise OSM::VersionError, 'OSM::StreamParser only understands OSM file version 0.5 and 0.6'
             end
         end
 
