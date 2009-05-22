@@ -372,7 +372,7 @@ module OSM
         # library. The only parameter is the builder object.
         def to_xml(xml)
             xml.node(attributes) do
-                tags.to_xml(x)
+                tags.to_xml(xml)
             end
         end
 
