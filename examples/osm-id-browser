@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #-----------------------------------------------------------------------------
 #
-#  OSM Inspector
+#  OSM Id Browser
 #
 #  Created by Jochen Topf <jochen@topf.org>
 #
@@ -9,10 +9,10 @@
 #
 #-----------------------------------------------------------------------------
 #
-#  The OSM Inspector is used to inspect the contents of the OSM database
-#  through a web interface. If you start the OSM Inspector it opens a
+#  The OSM Id Browser is used to inspect the contents of the OSM database
+#  through a web interface. If you start the OSM Id Browser it opens a
 #  web server on Port 8008. You can look up nodes, ways, and relations by
-#  ID. OSM Inspector will show you the OSM objects with all attributes,
+#  ID. OSM Id Browser will show you the OSM objects with all attributes,
 #  coordinates, tags, etc.
 #
 #-----------------------------------------------------------------------------
@@ -67,18 +67,18 @@ class LookupServlet < WEBrick::HTTPServlet::AbstractServlet
 
 end
 
-class InspectorServlet < WEBrick::HTTPServlet::AbstractServlet
+class IdBrowserServlet < WEBrick::HTTPServlet::AbstractServlet
 
     def html_for_page(x, title='', object=nil, history=nil, warning=nil, xml=nil)
         x.html do
             x.head do
-                x.title "#{title}OSM Inspector"
+                x.title "#{title}OSM Id Browser"
                 x.style CSS, :class => 'text/css'
             end
             x.body do
                 x.table(:class => 'top') do
                     x.tr do
-                        x.td { x.h1 'OSM Inspector' }
+                        x.td { x.h1 'OSM Id Browser' }
                         x.td do
                             x.form(:method => 'get', :action => '/lookup') do
                                 x.label('Lookup', :for => 'lookup')
@@ -94,7 +94,7 @@ class InspectorServlet < WEBrick::HTTPServlet::AbstractServlet
                     x.text! 'OSM data is Copyright '
                     x.a('OpenStreetMap', :class => 'extlink', :href => 'http://www.openstreetmap.org/')
                     x.text! 'contributors - This web page served by '
-                    x.a('OSM Inspector', :class => 'extlink', :href => 'http://osmlib.rubyforge.org/')
+                    x.a('OSM Id Browser', :class => 'extlink', :href => 'http://osmlib.rubyforge.org/')
                 end
             end
         end
@@ -105,7 +105,7 @@ end
 # Path: /
 # Everything thats not handled by on of the other servlets is
 # handled by this code that just creates an empty search box.
-class RootServlet < InspectorServlet
+class RootServlet < IdBrowserServlet
 
     def do_GET(request, response)
         response['Content-Type'] = 'text/html; charset=UTF-8'
@@ -124,7 +124,7 @@ end
 # Path: /way/ID
 # Path: /relation/ID
 # This is the main servlet showing information about an OSM object
-class ObjServlet < InspectorServlet
+class ObjServlet < IdBrowserServlet
 
     def initialize(config, type)
         super
