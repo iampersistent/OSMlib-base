@@ -54,9 +54,9 @@ module OSM
     class Callbacks
 
         case OSM.XMLParser
-            when 'REXML': include REXML::SAX2Listener
-            when 'Libxml': include XML::SaxParser::Callbacks
-            when 'Expat':
+            when 'REXML' then include REXML::SAX2Listener
+            when 'Libxml' then include XML::SaxParser::Callbacks
+            when 'Expat' then
             else
                 raise UnknownParserError
         end
