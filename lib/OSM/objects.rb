@@ -371,8 +371,8 @@ module OSM
         # Return XML for this node. This method uses the XML Builder
         # library. The only parameter is the builder object.
         def to_xml(xml)
-            xml.node(attributes) do |xml|
-                tags.to_xml(xml)
+            xml.node(attributes) do
+                tags.to_xml(x)
             end
         end
 
@@ -528,7 +528,7 @@ module OSM
         # Return XML for this way. This method uses the Builder library.
         # The only parameter ist the builder object.
         def to_xml(xml)
-            xml.way(attributes) do |xml|
+            xml.way(attributes) do
                 nodes.each do |node|
                     xml.nd(:ref => node)
                 end
@@ -648,7 +648,7 @@ module OSM
         # Return XML for this relation. This method uses the Builder library.
         # The only parameter ist the builder object.
         def to_xml(xml)
-            xml.relation(attributes) do |xml|
+            xml.relation(attributes) do
                 members.each do |member|
                     member.to_xml(xml)
                 end
